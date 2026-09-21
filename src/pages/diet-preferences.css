@@ -1,0 +1,52 @@
+/* Existing design-system tokens constrain all page styling; fixed values only describe the device canvas. */
+.diet-page{display:flex;flex-direction:column;min-height:100dvh;background:var(--ds-colorBgContainer);max-width:402px;margin:0 auto}
+.diet-air{flex:1 0 calc(var(--ds-marginXXL) + var(--ds-marginLG))}
+.diet-sheet{flex-shrink:0;max-width:none;margin:0;padding:var(--ds-paddingXL);background:var(--ds-colorBgContainer);border-radius:var(--ds-borderRadiusLG) var(--ds-borderRadiusLG) 0 0;border-top:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary)}
+.diet-group+.diet-group{margin-top:var(--ds-marginLG)}
+.diet-group h2{font-size:var(--ds-fontSizeLG);line-height:var(--ds-lineHeightLG);font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorPrimary);margin:0 0 var(--ds-marginSM)}
+.diet-chips{display:flex;flex-wrap:wrap;gap:var(--ds-marginXS)}
+.diet-chip-wrap{display:inline-flex;max-width:100%;border-radius:var(--ds-borderRadiusLG);background:var(--ds-colorFillTertiary);color:var(--ds-colorTextSecondary)}
+.diet-chip{display:inline-flex;align-items:center;justify-content:center;gap:var(--ds-marginXXS);border:0;border-radius:var(--ds-borderRadiusLG);padding:var(--ds-paddingXXS) var(--ds-paddingSM);min-height:var(--ds-controlHeight);background:transparent;color:inherit;cursor:pointer;font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight);overflow-wrap:anywhere;max-width:100%;transition:background var(--ds-motionDurationMid),color var(--ds-motionDurationMid)}
+.diet-chip-wrap.is-selected,.diet-inline-form{background:var(--ds-colorPrimaryBg);color:var(--ds-colorPrimaryText);box-shadow:inset 0 0 0 var(--ds-lineWidth) var(--ds-colorPrimaryBorder)}
+.diet-chip-wrap:hover{background:var(--ds-colorPrimaryBg)}
+.diet-chip .anticon{font-size:var(--ds-fontSizeSM);flex-shrink:0}
+.diet-add{background:var(--ds-colorFillTertiary);color:var(--ds-colorTextSecondary)}
+.diet-remove{padding:0 var(--ds-paddingXS);border:0;background:transparent;color:inherit;border-radius:var(--ds-borderRadiusLG);cursor:pointer}
+.diet-bottom{margin-top:var(--ds-marginLG);padding:0}
+.diet-continue.ant-btn{width:100%}
+.diet-summary{margin:var(--ds-marginLG) 0}.diet-summary h3{margin-bottom:var(--ds-marginXS)}.diet-summary p{overflow-wrap:anywhere}.diet-review-note{font-size:var(--ds-fontSizeSM);color:var(--ds-colorTextSecondary);margin-top:var(--ds-margin)}
+.diet-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* iPhone 17 Pro portrait design canvas; device geometry is not a global token. */
+.diet-page{max-width:402px;padding-top:env(safe-area-inset-top)}
+
+.diet-sheet{padding-left:var(--ds-paddingXL);padding-right:var(--ds-paddingXL)}
+.diet-chip{min-height:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS))}
+.diet-remove{min-width:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS));min-height:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS))}
+.diet-page{padding-bottom:env(safe-area-inset-bottom)}
+@media(min-width:600px){.diet-page{height:874px;min-height:0;overflow-y:auto;scrollbar-width:none;margin:var(--ds-marginLG) auto;outline:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:var(--ds-borderRadiusLG)}.diet-modal{max-width:370px}}
+@media(max-height:700px){.diet-air{height:var(--ds-marginLG)}}
+/* Inline custom entry uses the same row and existing theme scales. */
+.diet-add-slot{flex-basis:100%;min-width:0}
+.diet-inline-form{display:flex;align-items:center;width:100%;min-height:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS));border-radius:var(--ds-borderRadiusLG);padding-left:var(--ds-paddingSM);overflow:hidden}
+.diet-inline-form>.anticon{color:inherit;flex-shrink:0}
+.diet-inline-form .ant-input{color:inherit;min-width:0;font-size:var(--ds-fontSize);padding:var(--ds-paddingXXS) var(--ds-paddingXS)}
+.diet-inline-done{flex-shrink:0;display:flex;align-items:center;justify-content:center;min-width:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS));min-height:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS));border:0;background:transparent;color:var(--ds-colorPrimaryText);cursor:pointer;border-radius:var(--ds-borderRadiusLG)}
+.diet-inline-error{color:var(--ds-colorErrorText);font-size:var(--ds-fontSizeSM);margin-top:var(--ds-marginXXS)}
+/* Desktop-only keyboard demonstration. Real touch devices retain their system input. */
+.diet-page{height:100dvh;min-height:0;overflow:hidden}
+.diet-viewport{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none}
+.diet-inline-form{scroll-margin:var(--ds-marginLG)}
+.sim-keyboard{flex-shrink:0;background:var(--ds-colorBgLayout);border-top:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);padding:var(--ds-paddingXS);padding-bottom:var(--ds-paddingLG);animation:keyboard-arrive var(--ds-motionDurationSlow) var(--ds-motionEaseInOut);}
+.sim-keyboard-bar{display:flex;align-items:center;justify-content:space-between;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeSM);margin-bottom:var(--ds-marginXS)}
+.sim-keyboard button{border:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:var(--ds-borderRadius);background:var(--ds-colorBgContainer);color:var(--ds-colorText);min-height:var(--ds-controlHeightLG);padding:var(--ds-paddingXXS);font-size:var(--ds-fontSizeLG);cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;min-width:0}
+.sim-keyboard button:active,.sim-keyboard button[aria-pressed=true]{background:var(--ds-colorPrimaryBg);color:var(--ds-colorPrimaryText)}
+.sim-keyboard-bar button{min-height:var(--ds-controlHeightSM);width:var(--ds-controlHeight)}
+.sim-key-row{display:flex;gap:var(--ds-marginXXS);margin-top:var(--ds-marginXS)}
+.sim-key-row>button{flex:1}.sim-key-row-1{padding:0 var(--ds-paddingSM)}
+.sim-key-row>.sim-key-function{flex:1.4;background:var(--ds-colorFillSecondary)}
+.sim-key-row>.sim-key-space{flex:5}.sim-key-row>.sim-key-done{flex:2;background:var(--ds-colorPrimary);color:var(--ds-colorTextLightSolid)}
+.sim-keyboard button:disabled{opacity:.4;cursor:default}
+@keyframes keyboard-arrive{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(min-width:600px){.diet-page{height:874px}}
+
+.diet-inline-form .ant-input::placeholder{color:var(--ds-colorPrimaryText);opacity:1}
