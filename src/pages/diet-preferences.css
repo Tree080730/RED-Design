@@ -14,7 +14,10 @@
 .diet-remove{padding:0 var(--ds-paddingXS);border:0;background:transparent;color:inherit;border-radius:var(--ds-borderRadiusLG);cursor:pointer}
 .diet-bottom{margin-top:var(--ds-marginLG);padding:0}
 .diet-continue.ant-btn{width:100%}
-.diet-summary{margin:var(--ds-marginLG) 0}.diet-summary h3{margin-bottom:var(--ds-marginXS)}.diet-summary p{overflow-wrap:anywhere}.diet-review-note{font-size:var(--ds-fontSizeSM);color:var(--ds-colorTextSecondary);margin-top:var(--ds-margin)}
+.diet-confirm-title{font-size:var(--ds-fontSizeHeading3);line-height:var(--ds-lineHeightHeading3);font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorText);margin:0 0 var(--ds-marginLG)}
+.diet-chip-wrap.is-static,.diet-chip-wrap.is-static .diet-chip{cursor:default}
+.diet-none,.diet-empty{color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight);margin:0}
+.diet-review-note{font-size:var(--ds-fontSizeSM);color:var(--ds-colorTextSecondary);margin-top:var(--ds-margin)}
 .diet-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* iPhone 17 Pro portrait design canvas; device geometry is not a global token. */
 .diet-page{max-width:402px;padding-top:env(safe-area-inset-top)}
@@ -23,7 +26,7 @@
 .diet-chip{min-height:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS))}
 .diet-remove{min-width:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS));min-height:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS))}
 .diet-page{padding-bottom:env(safe-area-inset-bottom)}
-@media(min-width:600px){.diet-page{height:874px;min-height:0;overflow-y:auto;scrollbar-width:none;margin:var(--ds-marginLG) auto;outline:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:var(--ds-borderRadiusLG)}.diet-modal{max-width:370px}}
+@media(min-width:600px){.diet-page{height:874px;min-height:0;overflow-y:auto;scrollbar-width:none;margin:var(--ds-marginLG) auto;outline:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:var(--ds-borderRadiusLG)}}
 @media(max-height:700px){.diet-air{height:var(--ds-marginLG)}}
 /* Inline custom entry uses the same row and existing theme scales. */
 .diet-add-slot{flex-basis:100%;min-width:0}

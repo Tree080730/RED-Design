@@ -6,7 +6,8 @@ test('diet first page keeps choices across groups and custom edits',async({page}
  await page.getByLabel('Your preference').fill('No mushrooms');await page.getByRole('button',{name:'Add preference',exact:true}).click();
  await expect(page.getByRole('button',{name:'No mushrooms',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'Continue',exact:true}).click();
- await expect(page.getByRole('dialog')).toContainText('No mushrooms');await expect(page.getByRole('dialog')).toContainText('Peanut');
+ await expect(page.getByRole('heading',{name:'Confirm your preferences'})).toBeVisible();
+ await expect(page.locator('.diet-sheet')).toContainText('No mushrooms');await expect(page.locator('.diet-sheet')).toContainText('Peanut');
  await page.getByRole('button',{name:'Back to edit'}).click();
  for(const name of ['Peanut','No pork','Mild spice'])await expect(page.getByRole('button',{name,exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'No mushrooms',exact:true}).click();await expect(page.getByRole('button',{name:'No mushrooms',exact:true})).toHaveCount(0);
@@ -17,7 +18,7 @@ test('diet first page keeps choices across groups and custom edits',async({page}
  await page.screenshot({path:'docs/delivery/diet-preferences-mobile.png',fullPage:true});
 });
 test('empty choices are not treated as personal match and custom duplicates are reused',async({page})=>{
- await page.goto('/demo');await page.getByRole('button',{name:'Continue',exact:true}).click();await expect(page.getByRole('dialog')).toContainText('No preferences selected');await page.getByRole('button',{name:'Back to edit'}).click();
+ await page.goto('/demo');await page.getByRole('button',{name:'Continue',exact:true}).click();await expect(page.locator('.diet-sheet')).toContainText('Add your food requirements');await page.getByRole('button',{name:'Back to edit'}).click();
  await page.getByRole('button',{name:'Add other allergies'}).click();await page.getByLabel('Your preference').fill('  peanut  ');await page.getByRole('button',{name:'Add preference',exact:true}).click();await expect(page.getByRole('button',{name:'Peanut',exact:true})).toHaveCount(1);await expect(page.getByRole('button',{name:'Peanut',exact:true})).toHaveAttribute('aria-pressed','true');
 });
 

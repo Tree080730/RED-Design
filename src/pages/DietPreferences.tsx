@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { Button, Input, Modal, type InputRef } from 'antd';
+import { Button, Input, type InputRef } from 'antd';
 import { EditOutlined, CheckOutlined } from '@ant-design/icons';
 import './diet-preferences.css';
 import { SimulatedKeyboard } from './SimulatedKeyboard';
@@ -18,10 +18,12 @@ export default function DietPreferences(){
  const [custom,setCustom]=useState<Choices>(emptyChoices);
  const [editing,setEditing]=useState<GroupKey|null>(null);
  const [value,setValue]=useState('');const [error,setError]=useState('');
- const [review,setReview]=useState(false);
+ const [view,setView]=useState<'select'|'confirm'>('select');
  const [simulate]=useState(()=>navigator.maxTouchPoints===0);
  const inputRef=useRef<InputRef>(null);
  const formRef=useRef<HTMLFormElement>(null);
+ const viewportRef=useRef<HTMLDivElement>(null);
+ const goTo=(next:'select'|'confirm')=>{setView(next);requestAnimationFrame(()=>viewportRef.current?.scrollTo({top:0}));};
  useEffect(()=>{
   if(!editing)return;
   const reveal=()=>inputRef.current?.input?.scrollIntoView({block:'nearest',behavior:'auto'});
@@ -68,17 +70,21 @@ export default function DietPreferences(){
   setEditing(null);setValue('');setError('');
  }
 
- return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype"><div className="diet-viewport"><div className="diet-air" aria-hidden="true"/><main className="diet-sheet" aria-labelledby="diet-title">
+ return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype"><div className="diet-viewport" ref={viewportRef}><div className="diet-air" aria-hidden="true"/><main className="diet-sheet" aria-labelledby="diet-title">
+  {view==='select'?<>
   <h1 id="diet-title" className="diet-sr-only">Your food preferences</h1>
   {groups.map(g=><section className="diet-group" key={g.key} aria-labelledby={`heading-${g.key}`}><h2 id={`heading-${g.key}`}>{g.title}</h2><div className="diet-chips">{[...g.options,...custom[g.key]].map(label=><span className={`diet-chip-wrap ${selected[g.key].includes(label)?'is-selected':''}`} key={label}><button type="button" className="diet-chip" aria-label={label} aria-pressed={selected[g.key].includes(label)} onClick={()=>toggle(g.key,label)}>{label}</button></span>)}<div className="diet-add-slot">{editing===g.key?<form ref={formRef} className="diet-inline-form" onSubmit={e=>{e.preventDefault();add();}} onBlur={e=>{if(e.relatedTarget&&(e.currentTarget.contains(e.relatedTarget as Node)||(e.relatedTarget as HTMLElement).closest('.sim-keyboard')))return;if(value.trim())add();else cancel();}}>
  <EditOutlined aria-hidden="true"/><Input ref={inputRef} variant="borderless" aria-label="Your preference" aria-invalid={!!error} aria-describedby={error?`error-${g.key}`:undefined} placeholder="Add your own" value={value} maxLength={40} enterKeyHint="done" autoComplete="off" onChange={e=>{setValue(e.target.value);setError('');}} onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();cancel();}if(e.key==='Enter'&&e.nativeEvent.isComposing)e.preventDefault();}}/>
  <button type="submit" className="diet-inline-done" aria-label="Add preference" onPointerDown={e=>e.preventDefault()}><CheckOutlined/></button>
  </form>:<button className="diet-chip diet-add" onClick={e=>begin(g.key,e.currentTarget)} aria-label={`Add other ${g.title.toLowerCase()}`}><EditOutlined/> Add your own</button>}{editing===g.key&&error&&<p className="diet-inline-error" id={`error-${g.key}`} role="alert">{error}</p>}</div></div></section>)}
-  <div className="diet-bottom"><Button type="primary" size="large" className="diet-continue" onClick={()=>setReview(true)}>Continue</Button><span className="diet-sr-only" role="status">{count} preferences selected across all categories</span></div>
+  <div className="diet-bottom"><Button type="primary" size="large" className="diet-continue" onClick={()=>goTo('confirm')}>Continue</Button><span className="diet-sr-only" role="status">{count} preferences selected across all categories</span></div>
+  </>:<>
+  <h1 id="diet-title" className="diet-confirm-title">Confirm your preferences</h1>
+  {count?<>{groups.map(g=><section className="diet-group" key={g.key} aria-labelledby={`confirm-${g.key}`}><h2 id={`confirm-${g.key}`}>{g.title}</h2>{selected[g.key].length?<div className="diet-chips">{selected[g.key].map(label=><span className="diet-chip-wrap is-selected is-static" key={label}><span className="diet-chip">{label}</span></span>)}</div>:<p className="diet-none">None selected</p>}</section>)}<p className="diet-review-note">Your selections stay together across all three categories.</p></>:<p className="diet-empty">You can explore without preferences. Add your food requirements before getting a personalized match.</p>}
+  <p className="diet-review-note">Demo preview · This confirms your selections. The next screen is not part of this prototype yet.</p>
+  <div className="diet-bottom"><Button type="primary" size="large" className="diet-continue" onClick={()=>goTo('select')}>Back to edit</Button></div>
+  </>}
  </main></div>
- {editing&&simulate&&<SimulatedKeyboard onKey={typeKey} onDone={add} onDismiss={()=>{if(value.trim())add();else cancel();}} onReveal={revealInput}/>}
- <Modal className="diet-modal" getContainer={() => document.querySelector('.ds-root') as HTMLElement} title={count?'Your food preferences':'No preferences selected'} open={review} onCancel={()=>setReview(false)} footer={<Button type="primary" onClick={()=>setReview(false)}>Back to edit</Button>}>
- {count?<>{groups.map(g=><div className="diet-summary" key={g.key}><h3>{g.title}</h3><p>{selected[g.key].join(' · ')||'None selected'}</p></div>)}<p className="diet-review-note">Your selections stay together across all three categories.</p></>:<p>You can explore without preferences. Add your food requirements before getting a personalized match.</p>}
- <p className="diet-review-note">Demo preview · This confirms your selections. The next screen is not part of this prototype yet.</p>
- </Modal></div>;
+ {view==='select'&&editing&&simulate&&<SimulatedKeyboard onKey={typeKey} onDone={add} onDismiss={()=>{if(value.trim())add();else cancel();}} onReveal={revealInput}/>}
+ </div>;
 }
