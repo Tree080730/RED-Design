@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { Button, Input, type InputRef } from 'antd';
-import { EditOutlined, CheckOutlined } from '@ant-design/icons';
+import { Button, Input, message, type InputRef } from 'antd';
+import { EditOutlined, CheckOutlined, LeftOutlined } from '@ant-design/icons';
 import './diet-preferences.css';
 import { SimulatedKeyboard } from './SimulatedKeyboard';
 import { MouthFrame } from '../components/MouthFrame';
@@ -15,6 +15,7 @@ type GroupKey = typeof groups[number]['key'];
 type Choices = Record<GroupKey,string[]>;
 const emptyChoices=():Choices=>({allergies:[],diet:[],preferences:[]});
 export default function DietPreferences(){
+ const [notice,noticeContext]=message.useMessage();
  const [selected,setSelected]=useState<Choices>(emptyChoices);
  const [custom,setCustom]=useState<Choices>(emptyChoices);
  const [editing,setEditing]=useState<GroupKey|null>(null);
@@ -79,11 +80,15 @@ export default function DietPreferences(){
  }
 
  return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype">
+  {noticeContext}
   <div className="diet-viewport diet-mouth-viewport" ref={viewportRef} inert={view==='confirm'?true:undefined}>
+   <header className="diet-header">
+    <Button type="text" className="diet-back" aria-label="Go back" icon={<LeftOutlined/>} onClick={()=>{if(editing){cancel();return;}if(window.history.length>1)window.history.back();else void notice.info("You're at the first step of this demo.");}}/>
+    <h1 id="diet-title">What do you avoid?</h1>
+   </header>
    <main className="diet-mouth-scene" aria-labelledby="diet-title">
    <MouthFrame/>
    <div className="diet-mouth-content">
-  <h1 id="diet-title" className="diet-sr-only">Your food preferences</h1>
   {groups.map(g=><section className="diet-group" key={g.key} aria-labelledby={`heading-${g.key}`}><h2 id={`heading-${g.key}`}>{g.title}</h2><div className="diet-chips">{[...g.options,...custom[g.key]].map(label=><span className={`diet-chip-wrap ${selected[g.key].includes(label)?'is-selected':''}`} key={label}><button type="button" className="diet-chip" aria-label={label} aria-pressed={selected[g.key].includes(label)} onClick={()=>toggle(g.key,label)}>{label}</button></span>)}<div className="diet-add-slot">{editing===g.key?<form ref={formRef} className="diet-inline-form" onSubmit={e=>{e.preventDefault();add();}} onBlur={e=>{if(e.relatedTarget&&(e.currentTarget.contains(e.relatedTarget as Node)||(e.relatedTarget as HTMLElement).closest('.sim-keyboard')))return;if(value.trim())add();else cancel();}}>
  <EditOutlined aria-hidden="true"/><Input ref={inputRef} variant="borderless" aria-label="Your preference" aria-invalid={!!error} aria-describedby={error?`error-${g.key}`:undefined} placeholder="Add your own" value={value} maxLength={40} enterKeyHint="done" autoComplete="off" onChange={e=>{setValue(e.target.value);setError('');}} onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();cancel();}if(e.key==='Enter'&&e.nativeEvent.isComposing)e.preventDefault();}}/>
  <button type="submit" className="diet-inline-done" aria-label="Add preference" onPointerDown={e=>e.preventDefault()}><CheckOutlined/></button>
