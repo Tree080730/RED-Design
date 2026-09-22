@@ -5,6 +5,9 @@ import { EditOutlined, CheckOutlined, LeftOutlined } from '@ant-design/icons';
 import './diet-preferences.css';
 import { SimulatedKeyboard } from './SimulatedKeyboard';
 import { MouthFrame } from '../components/MouthFrame';
+import CameraCapture from './CameraCapture';
+import PhotoConfirm from './PhotoConfirm';
+import Analyzing from './Analyzing';
 
 const groups = [
  {key:'allergies',title:'Allergies',options:['Peanut','Tree nuts','Shellfish','Fish','Milk','Egg','Wheat','Soy','Sesame']},
@@ -20,12 +23,12 @@ export default function DietPreferences(){
  const [custom,setCustom]=useState<Choices>(emptyChoices);
  const [editing,setEditing]=useState<GroupKey|null>(null);
  const [value,setValue]=useState('');const [error,setError]=useState('');
- const [view,setView]=useState<'select'|'confirm'>('select');
+ const [view,setView]=useState<'select'|'confirm'|'camera'|'photo-confirm'|'analyzing'>('select');
  const [simulate]=useState(()=>navigator.maxTouchPoints===0);
  const inputRef=useRef<InputRef>(null);
  const formRef=useRef<HTMLFormElement>(null);
  const viewportRef=useRef<HTMLDivElement>(null);
- const goTo=(next:'select'|'confirm')=>{setView(next);requestAnimationFrame(()=>viewportRef.current?.scrollTo({top:0}));};
+ const goTo=(next:'select'|'confirm'|'camera'|'photo-confirm'|'analyzing')=>{setView(next);requestAnimationFrame(()=>viewportRef.current?.scrollTo({top:0}));};
  useEffect(()=>{
   if(!editing)return;
   const reveal=()=>revealInput();
@@ -81,7 +84,7 @@ export default function DietPreferences(){
 
  return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype">
   {noticeContext}
-  <div className="diet-viewport diet-mouth-viewport" ref={viewportRef} inert={view==='confirm'?true:undefined}>
+  <div className="diet-viewport diet-mouth-viewport" ref={viewportRef} inert={view!=='select'?true:undefined}>
    <header className="diet-header">
     <Button type="text" className="diet-back" aria-label="Go back" icon={<LeftOutlined/>} onClick={()=>{if(editing){cancel();return;}if(window.history.length>1)window.history.back();else void notice.info("You're at the first step of this demo.");}}/>
     <h1 id="diet-title">What do you avoid?</h1>
@@ -101,11 +104,13 @@ export default function DietPreferences(){
    <button type="button" className="diet-confirm-backdrop" aria-label="Close confirmation" onClick={()=>goTo('select')}/>
    <main className="diet-sheet diet-confirm-sheet" aria-labelledby="confirm-title">
   <h1 id="confirm-title" className="diet-confirm-title">Confirm your preferences</h1>
-  {count?<>{groups.map(g=><section className="diet-group" key={g.key} aria-labelledby={`confirm-${g.key}`}><h2 id={`confirm-${g.key}`}>{g.title}</h2>{selected[g.key].length?<div className="diet-chips">{selected[g.key].map(label=><span className="diet-chip-wrap is-selected is-static" key={label}><span className="diet-chip">{label}</span></span>)}</div>:<p className="diet-none">None selected</p>}</section>)}<p className="diet-review-note">Your selections stay together across all three categories.</p></>:<p className="diet-empty">You can explore without preferences. Add your food requirements before getting a personalized match.</p>}
-  <p className="diet-review-note">Demo preview · This confirms your selections. The next screen is not part of this prototype yet.</p>
-  <div className="diet-bottom"><Button type="primary" size="large" className="diet-continue" onClick={()=>goTo('select')}>Back to edit</Button></div>
+  {count?<>{groups.map(g=><section className="diet-group" key={g.key} aria-labelledby={`confirm-${g.key}`}><h2 id={`confirm-${g.key}`}>{g.title}</h2>{selected[g.key].length?<div className="diet-chips">{selected[g.key].map(label=><span className="diet-chip-wrap is-selected is-static" key={label}><span className="diet-chip">{label}</span></span>)}</div>:<p className="diet-none">None selected</p>}</section>)}<p className="diet-review-note">We'll save these preferences together for future food checks.</p></>:<p className="diet-empty">You can explore without preferences. Add your food requirements before getting a personalized match.</p>}
+  <div className="diet-bottom"><Button type="primary" size="large" className="diet-continue" onClick={()=>goTo('camera')}>Confirm</Button></div>
    </main>
   </div>}
+ {view==='camera'&&<CameraCapture onBack={()=>goTo('select')} onCapture={()=>goTo('photo-confirm')}/>}
+ {view==='photo-confirm'&&<PhotoConfirm onBack={()=>goTo('camera')} onRetake={()=>goTo('camera')} onCheck={()=>goTo('analyzing')}/>}
+ {view==='analyzing'&&<Analyzing onBack={()=>goTo('photo-confirm')}/>}
  {view==='select'&&editing&&simulate&&<SimulatedKeyboard onKey={typeKey} onDone={add} onDismiss={()=>{if(value.trim())add();else cancel();}} onReveal={revealInput}/>}
  </div>;
 }

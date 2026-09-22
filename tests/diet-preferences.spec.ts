@@ -8,7 +8,8 @@ test('diet first page keeps choices across groups and custom edits',async({page}
  await page.getByRole('button',{name:'Continue',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Confirm your preferences'})).toBeVisible();
  await expect(page.locator('.diet-sheet')).toContainText('No mushrooms');await expect(page.locator('.diet-sheet')).toContainText('Peanut');
- await page.getByRole('button',{name:'Back to edit'}).click();
+ await page.getByRole('button',{name:'Confirm',exact:true}).click();await expect(page.getByRole('heading',{name:'What’s on the table?'})).toBeVisible();
+ await page.getByRole('button',{name:'Back to preferences'}).click();
  for(const name of ['Peanut','No pork','Mild spice'])await expect(page.getByRole('button',{name,exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'No mushrooms',exact:true}).click();await expect(page.getByRole('button',{name:'No mushrooms',exact:true})).toHaveCount(0);
  await page.getByRole('button',{name:'Peanut',exact:true}).click();await expect(page.getByRole('button',{name:'Peanut',exact:true})).toHaveAttribute('aria-pressed','false');
@@ -18,8 +19,32 @@ test('diet first page keeps choices across groups and custom edits',async({page}
  await page.screenshot({path:'docs/delivery/diet-preferences-mobile.png',fullPage:true});
 });
 test('empty choices are not treated as personal match and custom duplicates are reused',async({page})=>{
- await page.goto('/demo');await page.getByRole('button',{name:'Continue',exact:true}).click();await expect(page.locator('.diet-sheet')).toContainText('Add your food requirements');await page.getByRole('button',{name:'Back to edit'}).click();
+ await page.goto('/demo');await page.getByRole('button',{name:'Continue',exact:true}).click();await expect(page.locator('.diet-sheet')).toContainText('Add your food requirements');await page.getByRole('button',{name:'Confirm',exact:true}).click();await page.getByRole('button',{name:'Back to preferences'}).click();
  await page.getByRole('button',{name:'Add other allergies'}).click();await page.getByLabel('Your preference').fill('  peanut  ');await page.getByRole('button',{name:'Add preference',exact:true}).click();await expect(page.getByRole('button',{name:'Peanut',exact:true})).toHaveCount(1);await expect(page.getByRole('button',{name:'Peanut',exact:true})).toHaveAttribute('aria-pressed','true');
+});
+
+test('confirm opens camera page with shutter',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo');await page.getByRole('button',{name:'Continue',exact:true}).click();await page.getByRole('button',{name:'Confirm',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'What’s on the table?'})).toBeVisible();await expect(page.getByLabel('Camera preview')).toBeVisible();
+ const zoomTwo=page.getByRole('button',{name:'2× zoom'});await zoomTwo.click();await expect(zoomTwo).toHaveText('2x');await expect(zoomTwo).toHaveAttribute('aria-pressed','true');
+ const expectSelectedZoomCentered=async()=>expect.poll(async()=>page.evaluate(()=>{const preview=document.querySelector('.camera-viewfinder')!.getBoundingClientRect();const indicator=document.querySelector('.camera-zoom-indicator')!.getBoundingClientRect();const selected=document.querySelector('.camera-zoom button[aria-pressed=true]')!.getBoundingClientRect();return Math.max(Math.abs(indicator.left+indicator.width/2-selected.left-selected.width/2),Math.abs(preview.left+preview.width/2-selected.left-selected.width/2));})).toBeLessThan(1);
+ await expectSelectedZoomCentered();
+ for(const level of ['0.5','1','5']){await page.getByRole('button',{name:`${level}× zoom`,exact:true}).click();await expectSelectedZoomCentered();}
+ const flash=page.locator('.camera-flash');await expect(flash).toHaveAttribute('aria-pressed','false');await flash.click();await expect(flash).toHaveAttribute('aria-pressed','true');await flash.click();await expect(flash).toHaveAttribute('aria-pressed','false');
+ const controlAlignment=await page.evaluate(()=>{const pageBox=document.querySelector('.camera-page')!.getBoundingClientRect();const controls=[...document.querySelectorAll('.camera-tool')] as HTMLElement[];const shutter=document.querySelector('.camera-shutter')!.getBoundingClientRect();return {left:controls[0].getBoundingClientRect().left-pageBox.left,right:pageBox.right-controls[1].getBoundingClientRect().right,center:Math.abs(shutter.left+shutter.width/2-(pageBox.left+pageBox.width/2))};});expect(controlAlignment.left).toBeCloseTo(32,0);expect(controlAlignment.right).toBeCloseTo(32,0);expect(controlAlignment.center).toBeLessThan(1);
+ await page.getByRole('button',{name:'Capture photo'}).click();await expect(page.getByRole('heading',{name:'Look good?'})).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight&&document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.getByRole('button',{name:'Again',exact:true}).click();await expect(page.getByLabel('Camera preview')).toBeVisible();
+ await page.getByRole('button',{name:'Back to preferences'}).click();await expect(page.getByRole('heading',{name:'What do you avoid?'})).toBeVisible();
+});
+
+test('app controls have no hover-only visual state',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo');
+ const expectHoverStable=async(targetSelector:string,styleSelector=targetSelector)=>{await page.mouse.move(1,1);await page.waitForTimeout(250);const read=()=>page.locator(styleSelector).first().evaluate(element=>{const style=getComputedStyle(element);return [style.backgroundColor,style.color,style.borderTopColor,style.boxShadow].join('|');});const before=await read();await page.locator(targetSelector).first().hover();await page.waitForTimeout(250);expect(await read()).toBe(before);};
+ await expectHoverStable('.diet-chip','.diet-chip-wrap');await expectHoverStable('.diet-back');await expectHoverStable('.diet-continue');
+ await page.locator('.diet-continue').click();await expectHoverStable('.diet-confirm-sheet .diet-continue');await page.locator('.diet-confirm-sheet .diet-continue').click();
+ await expectHoverStable('.camera-back');await expectHoverStable('.camera-flash');await expectHoverStable('.camera-tool:not(.camera-flash)');
+ await page.locator('.camera-flash').click();await expectHoverStable('.camera-flash');
 });
 
 test('iPhone 17 Pro fits default and selected content without scrolling',async({page})=>{

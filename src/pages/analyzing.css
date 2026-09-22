@@ -1,0 +1,30 @@
+/* Analyzing overlays the diet-page container just like the camera page. */
+.analyzing-page{position:absolute;inset:0;z-index:4;background:var(--ds-colorBgContainer);overflow:hidden}
+.analyzing-header{position:absolute;inset:0 0 auto;height:15.2%;z-index:2;display:flex;align-items:center;justify-content:center;padding-top:env(safe-area-inset-top)}
+.analyzing-header h1{margin:0;color:var(--ds-colorPrimary);font-size:var(--ds-fontSizeHeading3);line-height:var(--ds-lineHeightHeading3);font-weight:var(--ds-fontWeightStrong);white-space:nowrap}
+.analyzing-back.ant-btn{position:absolute;left:var(--ds-padding);top:50%;transform:translateY(-50%);width:calc(var(--ds-controlHeightLG) + var(--ds-paddingXS));height:44px;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
+.analyzing-back.ant-btn:hover{background:transparent!important;color:var(--ds-colorTextSecondary)!important}
+.analyzing-thinking{position:absolute;left:0;right:0;top:var(--a-emoji-top,28%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:var(--ds-marginLG);padding:0 var(--ds-paddingXL);text-align:center}
+.analyzing-emoji{display:block;font-size:calc(var(--ds-controlHeightLG) * 2);line-height:1;animation:analyzing-rise var(--ds-motionDurationSlow) var(--ds-motionEaseOut) both}
+.analyzing-status{margin:0;min-height:calc(var(--ds-fontSizeLG) * 1.6);color:var(--ds-colorTextTertiary);font-size:var(--ds-fontSizeLG);animation:analyzing-rise var(--ds-motionDurationSlow) var(--ds-motionEaseOut) both}
+@keyframes analyzing-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.analyzing-mouth-scene{position:absolute;left:var(--a-side,0%);right:var(--a-side,0%);top:var(--a-top,70%);bottom:var(--a-bottom,0%);z-index:0;isolation:isolate}
+.analyzing-mouth.mouth-frame-art{border-radius:var(--a-frame-radius,56px)}
+.analyzing-mouth.mouth-frame-art::before{width:44px;height:32px;top:-16px;left:calc(50% - 22px);border-radius:calc(var(--ds-borderRadiusLG) * 2)}
+.analyzing-mouth .mouth-frame-cavity{inset:var(--a-cavity,16px);border-radius:calc(var(--ds-borderRadiusLG) * 6)}
+.analyzing-mouth .mouth-frame-interior{inset:var(--a-int-top,24px) 0 var(--a-int-bot,16px)}
+.analyzing-mouth .mouth-frame-tongue{height:var(--a-tongue,39px)}
+@media(prefers-reduced-motion:reduce){.analyzing-emoji,.analyzing-status{animation:none}}
+@media(min-width:600px){.analyzing-page{border-radius:var(--ds-borderRadiusLG)}}
+
+/* Dev tuner panel: appears only in `npm run dev`. Sliders drive the CSS
+ * custom properties above so mouth size/position update live. */
+.analyzing-tuner{position:fixed;top:var(--ds-marginLG);right:var(--ds-marginLG);z-index:1000;width:260px;padding:var(--ds-paddingSM) var(--ds-padding);border-radius:var(--ds-borderRadiusLG);background:var(--brand-snow);box-shadow:0 8px 24px rgba(0,0,0,.12);font-family:var(--ds-fontFamily);font-size:var(--ds-fontSizeSM);color:var(--ds-colorText);display:flex;flex-direction:column;gap:var(--ds-marginXS)}
+.analyzing-tuner-title{display:flex;justify-content:space-between;align-items:center;font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorPrimary)}
+.analyzing-tuner-reset{border:0;background:transparent;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeSM);cursor:pointer;padding:2px var(--ds-paddingXS)}
+.analyzing-tuner-reset:hover{color:var(--ds-colorPrimary)}
+.analyzing-tuner-row{display:grid;grid-template-columns:96px 1fr 48px;align-items:center;gap:var(--ds-marginXS);line-height:1.2}
+.analyzing-tuner-row span{color:var(--ds-colorTextSecondary)}
+.analyzing-tuner-row input[type=range]{width:100%;accent-color:var(--ds-colorPrimary)}
+.analyzing-tuner-row output{text-align:right;color:var(--ds-colorText);font-variant-numeric:tabular-nums}
+@media(max-width:800px){.analyzing-tuner{position:fixed;top:auto;right:var(--ds-marginSM);bottom:var(--ds-marginSM);left:var(--ds-marginSM);width:auto;max-height:40vh;overflow-y:auto}}
