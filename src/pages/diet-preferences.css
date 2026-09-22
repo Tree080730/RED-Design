@@ -1,7 +1,14 @@
 /* Existing design-system tokens constrain all page styling; fixed values only describe the device canvas. */
-.diet-page{display:flex;flex-direction:column;min-height:100dvh;background:var(--ds-colorBgContainer);max-width:402px;margin:0 auto}
+.diet-page{display:flex;flex-direction:column;min-height:100dvh;background:var(--ds-colorBgContainer);max-width:402px;margin:0 auto;position:relative}
 .diet-air{flex:1 0 calc(var(--ds-marginXXL) + var(--ds-marginLG))}
 .diet-character-stage{display:flex;align-items:center;justify-content:center;flex-basis:220px;padding:var(--ds-paddingXXS) var(--ds-paddingXL)}
+/* Confirm presents as a sheet over the blurred select screen, so focus locks on the front card. */
+.diet-confirm-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;z-index:2}
+.diet-confirm-backdrop{position:absolute;inset:0;border:0;padding:0;cursor:pointer;background:color-mix(in srgb,var(--ds-colorBgContainer) 46%,transparent);backdrop-filter:blur(22px) saturate(1.1);-webkit-backdrop-filter:blur(22px) saturate(1.1);animation:diet-frost-in var(--ds-motionDurationSlow) var(--ds-motionEaseInOut)}
+.diet-confirm-sheet{position:relative;z-index:1;max-height:82%;overflow-y:auto;scrollbar-width:none;box-shadow:var(--ds-boxShadow);animation:diet-sheet-rise var(--ds-motionDurationSlow) var(--ds-motionEaseInOut)}
+@keyframes diet-frost-in{from{opacity:0}to{opacity:1}}
+@keyframes diet-sheet-rise{from{transform:translateY(28px);opacity:.5}to{transform:translateY(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){.diet-confirm-backdrop,.diet-confirm-sheet{animation:none}}
 .diet-sheet{flex-shrink:0;max-width:none;margin:0;padding:var(--ds-paddingXL);background:var(--ds-colorBgContainer);border-radius:var(--ds-borderRadiusLG) var(--ds-borderRadiusLG) 0 0;border-top:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary)}
 .diet-group+.diet-group{margin-top:var(--ds-marginLG)}
 .diet-group h2{font-size:var(--ds-fontSizeLG);line-height:var(--ds-lineHeightLG);font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorPrimary);margin:0 0 var(--ds-marginSM)}
@@ -54,3 +61,16 @@
 @media(min-width:600px){.diet-page{height:874px}}
 
 .diet-inline-form .ant-input::placeholder{color:var(--ds-colorPrimaryText);opacity:1}
+
+/* Mouth geometry is an illustration; UI dimensions retain the existing tokens. */
+.diet-mouth-viewport{padding:var(--ds-paddingXL) 0 var(--ds-paddingLG);gap:var(--ds-marginLG)}
+.diet-mouth-scene{position:relative;isolation:isolate;flex:1 0 auto;max-width:none;margin:0;padding:calc(var(--ds-paddingXL)*3) calc(100% * 24 / 386 + var(--ds-padding)) calc(var(--ds-paddingXL)*3);display:flex;align-items:center;min-width:0}
+.mouth-frame-art{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.diet-mouth-content{flex:1;width:100%;min-width:0}
+.diet-mouth-content .diet-group h2{color:var(--brand-blueLight)}
+.diet-mouth-content .diet-chip{padding-left:var(--ds-paddingXS);padding-right:var(--ds-paddingXS)}
+.diet-mouth-content .diet-chip-wrap:not(.is-selected),.diet-mouth-content .diet-add{background:color-mix(in srgb,var(--brand-snow) 22%,transparent);color:var(--brand-snow)}
+.diet-mouth-content .diet-chip-wrap:not(.is-selected):hover,.diet-mouth-content .diet-add:hover{background:color-mix(in srgb,var(--brand-snow) 30%,transparent)}
+.diet-mouth-content .diet-chip-wrap.is-selected,.diet-mouth-content .diet-inline-form{background:var(--ds-colorPrimaryBg);color:var(--ds-colorPrimaryText)}
+.diet-mouth-content .diet-inline-error{color:var(--brand-snow)}
+.diet-mouth-action{flex-shrink:0;margin:0;padding:0 calc(var(--ds-paddingXL) + var(--ds-paddingXS))}
