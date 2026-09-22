@@ -4,6 +4,7 @@ import { Button, Input, type InputRef } from 'antd';
 import { EditOutlined, CheckOutlined } from '@ant-design/icons';
 import './diet-preferences.css';
 import { SimulatedKeyboard } from './SimulatedKeyboard';
+import { WelcomeHead } from '../components/WelcomeHead';
 
 const groups = [
  {key:'allergies',title:'Allergies',options:['Peanut','Tree nuts','Shellfish','Fish','Milk','Egg','Wheat','Soy','Sesame']},
@@ -26,11 +27,18 @@ export default function DietPreferences(){
  const goTo=(next:'select'|'confirm')=>{setView(next);requestAnimationFrame(()=>viewportRef.current?.scrollTo({top:0}));};
  useEffect(()=>{
   if(!editing)return;
-  const reveal=()=>inputRef.current?.input?.scrollIntoView({block:'nearest',behavior:'auto'});
+  const reveal=()=>revealInput();
   window.visualViewport?.addEventListener('resize',reveal);
   return ()=>window.visualViewport?.removeEventListener('resize',reveal);
  },[editing]);
- const revealInput=()=>inputRef.current?.input?.scrollIntoView({block:'nearest',behavior:'auto'});
+ function revealInput(){
+  const form=formRef.current;const viewport=viewportRef.current;
+  if(!form||!viewport)return;
+  const bounds=form.getBoundingClientRect();const visible=viewport.getBoundingClientRect();
+  const gap=parseFloat(getComputedStyle(form).getPropertyValue('--ds-marginSM'));
+  if(bounds.bottom>visible.bottom-gap)viewport.scrollTop+=bounds.bottom-visible.bottom+gap;
+  else if(bounds.top<visible.top+gap)viewport.scrollTop+=bounds.top-visible.top-gap;
+ }
  useEffect(()=>{if(editing&&simulate){const frame=requestAnimationFrame(revealInput);return ()=>cancelAnimationFrame(frame);}},[editing,simulate]);
  function typeKey(key:string){
   const input=inputRef.current?.input;if(!input)return;
@@ -70,7 +78,7 @@ export default function DietPreferences(){
   setEditing(null);setValue('');setError('');
  }
 
- return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype"><div className="diet-viewport" ref={viewportRef}><div className="diet-air" aria-hidden="true"/><main className="diet-sheet" aria-labelledby="diet-title">
+ return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype"><div className="diet-viewport" ref={viewportRef}><div className={`diet-air ${view==='select'?'diet-character-stage':''}`}>{view==='select'&&<WelcomeHead/>}</div><main className="diet-sheet" aria-labelledby="diet-title">
   {view==='select'?<>
   <h1 id="diet-title" className="diet-sr-only">Your food preferences</h1>
   {groups.map(g=><section className="diet-group" key={g.key} aria-labelledby={`heading-${g.key}`}><h2 id={`heading-${g.key}`}>{g.title}</h2><div className="diet-chips">{[...g.options,...custom[g.key]].map(label=><span className={`diet-chip-wrap ${selected[g.key].includes(label)?'is-selected':''}`} key={label}><button type="button" className="diet-chip" aria-label={label} aria-pressed={selected[g.key].includes(label)} onClick={()=>toggle(g.key,label)}>{label}</button></span>)}<div className="diet-add-slot">{editing===g.key?<form ref={formRef} className="diet-inline-form" onSubmit={e=>{e.preventDefault();add();}} onBlur={e=>{if(e.relatedTarget&&(e.currentTarget.contains(e.relatedTarget as Node)||(e.relatedTarget as HTMLElement).closest('.sim-keyboard')))return;if(value.trim())add();else cancel();}}>

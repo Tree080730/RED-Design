@@ -1,6 +1,7 @@
 /* Existing design-system tokens constrain all page styling; fixed values only describe the device canvas. */
 .diet-page{display:flex;flex-direction:column;min-height:100dvh;background:var(--ds-colorBgContainer);max-width:402px;margin:0 auto}
 .diet-air{flex:1 0 calc(var(--ds-marginXXL) + var(--ds-marginLG))}
+.diet-character-stage{display:flex;align-items:center;justify-content:center;flex-basis:220px;padding:var(--ds-paddingXXS) var(--ds-paddingXL)}
 .diet-sheet{flex-shrink:0;max-width:none;margin:0;padding:var(--ds-paddingXL);background:var(--ds-colorBgContainer);border-radius:var(--ds-borderRadiusLG) var(--ds-borderRadiusLG) 0 0;border-top:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary)}
 .diet-group+.diet-group{margin-top:var(--ds-marginLG)}
 .diet-group h2{font-size:var(--ds-fontSizeLG);line-height:var(--ds-lineHeightLG);font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorPrimary);margin:0 0 var(--ds-marginSM)}

@@ -1,0 +1,10 @@
+/* Character geometry and colors reproduce the supplied face reference. */
+.welcome-head{display:block;width:218px;max-width:100%;padding:0;border:0;background:transparent;cursor:pointer;flex-shrink:0;border-radius:var(--ds-borderRadiusLG);-webkit-tap-highlight-color:transparent}
+.welcome-head svg{width:100%;height:auto;overflow:visible}
+.welcome-head-float{animation:welcome-breathe calc(var(--ds-motionDurationSlow)*12) var(--ds-motionEaseInOut) infinite;transform-origin:237px 180px}
+.welcome-head-eyes{animation:welcome-blink calc(var(--ds-motionDurationSlow)*20) linear infinite;transform-origin:237px 100px}
+.welcome-head-greeting{animation:welcome-greet calc(var(--ds-motionDurationSlow)*4) var(--ds-motionEaseInOut);transform-origin:237px 200px}
+@keyframes welcome-breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes welcome-blink{0%,44%,48%,100%{transform:scaleY(1)}46%{transform:scaleY(.07)}}
+@keyframes welcome-greet{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}65%{transform:rotate(5deg)}}
+@media(prefers-reduced-motion:reduce){.welcome-head *{animation:none!important;transition:none!important}.welcome-head-pupils{transform:none}}
