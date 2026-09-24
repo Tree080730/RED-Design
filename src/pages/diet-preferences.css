@@ -81,7 +81,6 @@
 .mouth-frame-tongue{position:absolute;bottom:0;right:0;width:60%;height:var(--ds-paddingXL)}
 .diet-mouth-content{position:relative;top:-16px;flex:1;width:100%;min-width:0}
 .diet-mouth-content .diet-group h2{color:var(--brand-blueLight)}
-.diet-mouth-content .diet-chip{padding-left:var(--ds-paddingXS);padding-right:var(--ds-paddingXS)}
 .diet-mouth-content .diet-chip-wrap:not(.is-selected),.diet-mouth-content .diet-add{background:color-mix(in srgb,var(--brand-snow) 22%,transparent);color:var(--brand-snow)}
 .diet-mouth-content .diet-chip-wrap.is-selected,.diet-mouth-content .diet-inline-form{background:var(--ds-colorPrimaryBg);color:var(--ds-colorPrimaryText)}
 .diet-mouth-content .diet-chip-wrap.is-selected{box-shadow:none}
