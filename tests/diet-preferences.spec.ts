@@ -3,6 +3,10 @@ const openDiet=async(page:any)=>{await page.goto('/demo');await page.getByRole('
 test('mouth setup uses the light layout and saves before dietary preferences',async({page})=>{
  await page.setViewportSize({width:402,height:874});await page.goto('/demo');
  await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
+ for(const label of ['Wide nose','Bridge nose','Slit nostrils','Heart nostrils'])await expect(page.getByRole('button',{name:label,exact:true})).toBeAttached();
+ await page.getByRole('button',{name:'Bridge nose',exact:true}).click();await page.getByRole('button',{name:'Heart nostrils',exact:true}).click();
+ await page.getByRole('tab',{name:'Mouth',exact:true}).click();await page.getByRole('tab',{name:'Nose',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Bridge nose',exact:true})).toHaveAttribute('aria-pressed','true');await expect(page.getByRole('button',{name:'Heart nostrils',exact:true})).toHaveAttribute('aria-pressed','true');
  for(const tab of ['Nose','Mouth','Teeth','Tongue','Hair']){await page.getByRole('tab',{name:tab,exact:true}).click();await expect(page.getByRole('tab',{name:tab,exact:true})).toHaveAttribute('aria-selected','true');}
  await page.getByRole('button',{name:'Spiky hair',exact:true}).click();
  await page.getByRole('tab',{name:'Teeth',exact:true}).click();await page.getByRole('button',{name:'Star sticker',exact:true}).click();
