@@ -1,4 +1,4 @@
-import { CustomNose, CustomTeeth, useMouthConfig } from '../components/MouthConfig';
+import { CustomNose, CustomTeeth, MouthEars, useMouthConfig } from '../components/MouthConfig';
 
 // A single vector face morphs between the two approved compositions.
 export function JourneyMouth({progress,chewing,result,droolOpacity,closure,chewWave,successProgress=0}:{progress:number;chewing:boolean;result:'yes'|'no'|null;droolOpacity:number;closure:number;chewWave:number;successProgress?:number}){
@@ -22,9 +22,9 @@ export function JourneyMouth({progress,chewing,result,droolOpacity,closure,chewW
    <clipPath id="journey-sick-clip"><path d="M22.5 900V665C22.5 627 49 597 86 597H317C354 597 380.5 627 380.5 665V900Z"/></clipPath>
    <clipPath id="journey-stream-clip"><path d="M22.5 684H380.5V920H22.5Z"/></clipPath>
   </defs>
+  <MouthEars {...rect([40,20,470,260,130],[-53.6,576.6,509.2,311.9,112.56])}/>
   <g fill="#FDDECB">
    <rect {...rect([40,20,470,260,130],[-53.6,576.6,509.2,311.9,112.56])}/>
-   <g opacity={1-progress}><rect {...rect([0,142,80,52,26],[-96,720,44,28,14])}/><rect {...rect([470,142,80,52,26],[455,720,44,28,14])}/></g>
    <CustomNose x={n(x(252),172.6)} y={n(y(0),554)} width={n(44*.53356,53.6)} height={n(42*.53356,38.6)}/>
    <ellipse className="journey-cheek" opacity={closed} cx={368+7*pulse} cy={635-14*pulse} rx={54+8*pulse} ry={64+5*pulse}/>
   </g>

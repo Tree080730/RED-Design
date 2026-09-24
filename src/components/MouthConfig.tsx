@@ -9,6 +9,19 @@ export function MouthConfigProvider({children}:{children:ReactNode}){
 }
 export const useMouthConfig=()=>useContext(Context);
 
+// Ear proportions measured against the supplied face reference (1056 × 584).
+// Draw behind the face so the inner end joins the cheek without a seam.
+export function MouthEars({x,y,width,height}:{x:number;y:number;width:number;height:number}){
+ const earHeight=width*116/1056;
+ const earWidth=width*150/1056;
+ const protrusion=width*86/1056;
+ const top=y+height*334/584-earHeight/2;
+ return <g fill="#FDDECB" data-mouth-ears="true">
+  <rect x={x-protrusion} y={top} width={earWidth} height={earHeight} rx={earHeight/2}/>
+  <rect x={x+width+protrusion-earWidth} y={top} width={earWidth} height={earHeight} rx={earHeight/2}/>
+ </g>;
+}
+
 function NostrilMarks({x,y,width,height}:{x:number;y:number;width:number;height:number}){
  const {config}=useMouthConfig();
  return <g transform={`translate(${x} ${y}) scale(${width/100} ${height/100})`} fill="#EEC6B6" stroke="#EEC6B6" strokeLinecap="round" strokeLinejoin="round">
@@ -30,14 +43,14 @@ function ToothSticker({x,y,size}:{x:number;y:number;size:number}){
  const shape=shapes[config.sticker];
  return <g transform={`translate(${x} ${y}) scale(${size/48}) rotate(-12 24 24)`} strokeLinejoin="round"><path d={shape.d} fill="#DADADA" stroke="#DADADA" strokeWidth="7" transform="translate(0 1.5)"/><path d={shape.d} fill={shape.color} stroke="#FFFFFF" strokeWidth="5" paintOrder="stroke"/></g>;
 }
-export function CustomTeeth({x,y,width,height}:{x:number;y:number;width:number;height:number}){
+export function CustomTeeth({x,y,width,height,showSticker=true}:{x:number;y:number;width:number;height:number;showSticker?:boolean}){
  const {config}=useMouthConfig();const tooth=width*.115;
  return <g transform={`translate(${x} ${y})`}>
   {config.teeth==='buck'&&<g fill="#FFFFFF"><rect x={width/2-tooth-2} width={tooth} height={height*1.4} rx={height*.46}/><rect x={width/2+2} width={tooth} height={height*1.4} rx={height*.46}/></g>}
   {config.teeth==='gold'&&<rect x={width*.74} width={tooth} height={tooth*1.057} rx={tooth*.19} fill="#FFDB13"/>}
-  {config.teeth==='gap'&&<rect x={width*.49} width={width*.035} height={height*1.3} fill={config.insideColor}/>}
+  {config.teeth==='gap'&&<rect x={width*.49} width={width*.035} y={-height*.02} height={Math.max(height*1.3,49)} fill={config.insideColor}/>}
   {config.teeth==='decay'&&<path fill="#61443A" d={`M${width*.29} 2l${tooth*.55} 4 -2 ${height*.42} -${tooth*.32} ${height*.3} -${tooth*.4} -5 2 -${height*.4}Z`}/>}
-  <ToothSticker x={width*.12} y={height*.1} size={height*.8}/>
+  {showSticker&&<ToothSticker x={width*.12} y={height*.1} size={height*.8}/>}
  </g>;
 }
 export function CustomTongue({x,y,width,height}:{x:number;y:number;width:number;height:number}){
@@ -53,19 +66,70 @@ export function MouthPortrait({viewBox='0 0 400 280'}:{viewBox?:string}){
  return <svg viewBox={viewBox} className="mouth-portrait" role="img" aria-label="Your custom mouth preview">
   <defs><clipPath id={clip}><path d={mouthPath}/></clipPath></defs>
   {config.hair!=='none'&&<path fill={config.hairColor} d={config.hair==='spiky'?'M26 150V20L88 40 145 -34 200 14 255 -34 312 40 374 20V150Z':config.hair==='wave'?'M26 150V35Q15 -5 65 3Q106 -38 161 -8Q216 -40 265 -8Q316 -26 350 10Q385 12 374 150Z':'M26 150V30Q26 -4 65 -4H335Q374 -4 374 30V150Z'}/>}
-  <g fill="#FDDECB"><rect x="26" y="38" width="348" height="214" rx="105"/><rect x="2" y="132" width="60" height="44" rx="22"/><rect x="338" y="132" width="60" height="44" rx="22"/></g>
+  <MouthEars x={26} y={38} width={348} height={214}/>
+  <rect x="26" y="38" width="348" height="214" rx="105" fill="#FDDECB"/>
   <CustomNose x={183} y={24} width={34} height={26}/>
   <g transform={`translate(200 145) scale(${config.mouthSize/100}) translate(-200 -145)`}>
-   <g clipPath={`url(#${clip})`}><path fill={config.insideColor} d="M40 30H360V240H40Z"/><path fill="#FFFFFF" d="M40 40H360V84H40ZM40 206H360V240H40Z"/><CustomTeeth x={62} y={63} width={276} height={21}/><CustomTongue x={184} y={176} width={152} height={30}/></g>
+   <g clipPath={`url(#${clip})`}><path fill={config.insideColor} d="M40 30H360V240H40Z"/><path fill="#FFFFFF" d="M40 40H360V84H40ZM40 206H360V240H40Z"/><CustomTeeth x={40} y={config.teeth==='gap'?40:55} width={320} height={38}/><CustomTongue x={178} y={176} width={192} height={34}/></g>
   </g>
  </svg>;
+}
+function NoseShapeGeometry(){
+ const {config}=useMouthConfig();
+ return config.nose==='round'?<rect x="138" y="120" width="124" height="80" rx="40"/>:config.nose==='oval'?<circle cx="200" cy="186" r="78"/>:config.nose==='triangle'?<path d="M124 152L186 90Q200 76 214 90L276 152V190H124Z"/>:config.nose==='wide'?<rect x="108" y="120" width="184" height="76" rx="38"/>:<path d="M132 190Q136 154 166 146L181 100Q200 80 219 100L234 146Q264 154 268 190Z"/>;
 }
 function NoseOptionArt({detail}:{detail:boolean}){
  const {config}=useMouthConfig();
  return <svg viewBox="0 0 400 336" className="mouth-portrait" aria-hidden="true" preserveAspectRatio="none">
-  <g fill="#FDDECB">{detail?<rect x="84" y="100" width="232" height="144" rx="72"/>:config.nose==='round'?<rect x="138" y="120" width="124" height="80" rx="40"/>:config.nose==='oval'?<circle cx="200" cy="186" r="78"/>:config.nose==='triangle'?<path d="M124 152L186 90Q200 76 214 90L276 152V190H124Z"/>:config.nose==='wide'?<rect x="108" y="120" width="184" height="76" rx="38"/>:<path d="M132 190Q136 154 166 146L181 100Q200 80 219 100L234 146Q264 154 268 190Z"/>}<path d={detail?'M0 196H400V336H0Z':'M0 170H400V336H0Z'}/></g>
+  <g fill="#FDDECB">{detail?<rect x="84" y="100" width="232" height="144" rx="72"/>:<NoseShapeGeometry/>}<path d={detail?'M0 196H400V336H0Z':'M0 170H400V336H0Z'}/></g>
   <NostrilMarks x={detail?122:167} y={detail?84:108} width={detail?156:66} height={detail?156:84}/>
  </svg>;
+}
+// Final preview uses the teeth card's 400 × 336 coordinate system, including
+// its cropped-off face edges. Only the outer camera is zoomed out to show them.
+export function FinalMouthPortrait(){
+ const {config}=useMouthConfig();
+ const cavityClip=useId();
+ const insideClip=useId();
+ // Mouth shapes use the option artwork verbatim and a uniform transform.
+ const shapeScale=500/364;
+ const shapeTransform=`translate(200 191) scale(${shapeScale}) translate(-200 -174)`;
+ const mouthBounds=config.mouth==='oval'?{top:191-101*shapeScale,width:198*shapeScale,height:198*shapeScale}:config.mouth==='smile'?{top:191-85*shapeScale,width:334*shapeScale,height:170*shapeScale}:config.mouth==='square'?{top:191-82*shapeScale,width:276*shapeScale,height:172*shapeScale}:{top:66,width:500,height:250};
+ const partScale=mouthBounds.width/500;
+ const top=mouthBounds.top;
+ const bottom=top+mouthBounds.height;
+ const band=38*partScale;
+ // The round mouth has no flat upper edge. Place the entire tooth crown
+ // inside that curved lip, retaining the card's tooth / white-band ratio.
+ const crownInset=config.mouth==='oval'?(250-Math.sqrt(250**2-142**2))*partScale:0;
+ const teethTop=top+crownInset;
+ return <svg viewBox={config.hair==='none'?'-130 -48 660 432':'-130 -90 660 474'} className="mouth-portrait" role="img" aria-label="Your custom mouth preview">
+  <defs>
+   <clipPath data-part="cavity" id={cavityClip} transform={shapeTransform}><MouthShapeGeometry/></clipPath>
+   <clipPath data-part="interior-clip" id={insideClip}><rect x="-100" y={teethTop+band} width="600" height={Math.max(0,mouthBounds.height-band*2-crownInset)}/></clipPath>
+  </defs>
+  {config.hair!=='none'&&<g data-part="hair" transform="translate(-60 -16.78) scale(1.4942528736) translate(-26 0)"><path fill={config.hairColor} d={config.hair==='spiky'?'M26 150V20L88 40 145 -34 200 14 255 -34 312 40 374 20V150Z':config.hair==='wave'?'M26 150V35Q15 -5 65 3Q106 -38 161 -8Q216 -40 265 -8Q316 -26 350 10Q385 12 374 150Z':'M26 150V30Q26 -4 65 -4H335Q374 -4 374 30V150Z'}/></g>}
+  <MouthEars x={200-202*shapeScale} y={191-110*shapeScale} width={404*shapeScale} height={222*shapeScale}/>
+  <g data-part="face" transform={shapeTransform}><rect x="-2" y="64" width="404" height="222" rx="108" fill="#FDDECB"/></g>
+  <g data-part="nose" transform={`translate(200 40) scale(${56/124*config.noseSize/100}) translate(-200 -170)`} fill="#FDDECB"><NoseShapeGeometry/><NostrilMarks x={167} y={108} width={66} height={84}/></g>
+  <g data-part="opening" transform={`translate(200 190) scale(${config.mouthSize/100}) translate(-200 -190)`}>
+   <g clipPath={`url(#${cavityClip})`}>
+    <rect x="-100" y="-100" width="600" height="600" fill="#FFFFFF"/>
+    <g clipPath={`url(#${insideClip})`}>
+     <rect x="-100" y="-100" width="600" height="600" fill={config.insideColor}/>
+     <g data-part="tongue" transform={`translate(200 ${bottom-band}) scale(${partScale}) translate(-200 -278)`}><CustomTongue x={172} y={236} width={240} height={42}/></g>
+    </g>
+   </g>
+   {/* Teeth start at the upper white band's boundary, exactly as in the card.
+       Do not clip their crowns against the curved cavity outline. */}
+   <g data-part="teeth" transform={`translate(200 ${teethTop}) scale(${partScale}) translate(-200 -66)`}><CustomTeeth x={0} y={66} width={400} height={38} showSticker={false}/><ToothSticker x={48} y={66+18*38/71} size={40*38/71}/></g>
+   {config.teeth==='gap'&&crownInset>0&&<rect data-part="gap-bridge" x={200-4*partScale} y={top} width={14*partScale} height={crownInset+band} fill={config.insideColor}/>}
+  </g>
+ </svg>;
+}
+function MouthShapeGeometry(){
+ const {config}=useMouthConfig();
+ return config.mouth==='rounded'?<rect x="18" y="83" width="364" height="182" rx="91"/>:config.mouth==='oval'?<circle cx="200" cy="172" r="99"/>:config.mouth==='smile'?<path d="M84 89H316C345 89 367 108 367 137C367 204 313 259 246 259H154C87 259 33 204 33 137C33 108 55 89 84 89Z"/>:<path d="M62 92H338V264H62Z"/>;
 }
 function MouthShapeOptionArt(){
  const {config}=useMouthConfig();
@@ -73,7 +137,7 @@ function MouthShapeOptionArt(){
   <rect x="-2" y="64" width="404" height="222" rx="108" fill="#FDDECB"/>
   <CustomNose x={180} y={48} width={40} height={24}/>
   <g fill={config.insideColor}>
-   {config.mouth==='rounded'?<rect x="18" y="83" width="364" height="182" rx="91"/>:config.mouth==='oval'?<circle cx="200" cy="172" r="99"/>:config.mouth==='smile'?<path d="M84 89H316C345 89 367 108 367 137C367 204 313 259 246 259H154C87 259 33 204 33 137C33 108 55 89 84 89Z"/>:<path d="M62 92H338V264H62Z"/>}
+   <MouthShapeGeometry/>
   </g>
  </svg>;
 }
@@ -90,4 +154,9 @@ function TeethOptionArt({sticker}:{sticker:boolean}){
   </>}
  </svg>;
 }
-export function MouthOptionPreview({patch,viewBox}:{patch:Partial<MouthConfig>;viewBox?:string}){const {config}=useMouthConfig();return <Context.Provider value={{config:{...config,...patch,...('teeth' in patch?{sticker:'none' as const}:{})},setConfig:()=>{}}}>{'nose' in patch||'noseDetail' in patch?<NoseOptionArt detail={'noseDetail' in patch}/>: 'mouth' in patch?<MouthShapeOptionArt/>:'teeth' in patch||'sticker' in patch?<TeethOptionArt sticker={'sticker' in patch}/>:<MouthPortrait viewBox={viewBox}/>}</Context.Provider>;}
+export function MouthOptionPreview({patch,viewBox}:{patch:Partial<MouthConfig>;viewBox?:string}){
+ const {config}=useMouthConfig();
+ const previewConfig={...config,...patch,...('teeth' in patch?{sticker:'none' as const}:{})};
+ return <Context.Provider value={{config:previewConfig,setConfig:()=>{}}}>
+  {'nose' in patch||'noseDetail' in patch?<NoseOptionArt detail={'noseDetail' in patch}/>: 'mouth' in patch?<MouthShapeOptionArt/>:'teeth' in patch||'sticker' in patch?<TeethOptionArt sticker={'sticker' in patch}/>:<MouthPortrait viewBox={viewBox}/>}</Context.Provider>;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { Button, Input, message, type InputRef } from 'antd';
 import { EditOutlined, CheckOutlined, LeftOutlined } from '@ant-design/icons';
@@ -8,6 +8,7 @@ import { MouthFrame } from '../components/MouthFrame';
 import CameraCapture from './CameraCapture';
 import PhotoConfirm from './PhotoConfirm';
 import MouthSetup from './MouthSetup';
+import { SetupTransition } from './SetupTransition';
 
 const groups = [
  {key:'allergies',title:'Allergies',options:['Peanut','Tree nuts','Shellfish','Fish','Milk','Egg','Wheat','Soy','Sesame']},
@@ -20,6 +21,9 @@ const emptyChoices=():Choices=>({allergies:[],diet:[],preferences:[]});
 export default function DietPreferences(){
  const [notice,noticeContext]=message.useMessage();
  const [setup,setSetup]=useState(true);
+ const [entering,setEntering]=useState(false);
+ const finishEntry=useCallback(()=>{setEntering(false);setSetup(false);},[]);
+ const continueSetup=()=>{if(entering)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){setSetup(false);return;}setEntering(true);};
  const [selected,setSelected]=useState<Choices>(emptyChoices);
  const [custom,setCustom]=useState<Choices>(emptyChoices);
  const [editing,setEditing]=useState<GroupKey|null>(null);
@@ -83,10 +87,12 @@ export default function DietPreferences(){
   setEditing(null);setValue('');setError('');
  }
 
- if(setup)return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype"><MouthSetup onContinue={()=>setSetup(false)} onClose={()=>setSetup(false)}/></div>;
+
  return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype">
   {noticeContext}
-  <div className="diet-viewport diet-mouth-viewport" ref={viewportRef} inert={view!=='select'?true:undefined}>
+  {setup&&<div className="mouth-setup-layer" inert={entering?true:undefined}><MouthSetup onContinue={continueSetup} onClose={()=>setSetup(false)}/></div>}
+  {entering&&<SetupTransition onComplete={finishEntry}/>}
+  <div className={`diet-viewport diet-mouth-viewport ${entering?'diet-entering':''}`} style={{display:setup&&!entering?'none':undefined}} ref={viewportRef} inert={view!=='select'||entering?true:undefined}>
    <header className="diet-header">
     <Button type="text" className="diet-back" aria-label="Edit your mouth" icon={<LeftOutlined/>} onClick={()=>{if(editing){cancel();return;}setSetup(true);}}/>
     <h1 id="diet-title">What do you avoid?</h1>

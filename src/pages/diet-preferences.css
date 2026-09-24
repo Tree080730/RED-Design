@@ -14,7 +14,7 @@
 .diet-group h2{font-size:var(--ds-fontSizeLG);line-height:var(--ds-lineHeightLG);font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorPrimary);margin:0 0 var(--ds-marginSM)}
 .diet-chips{display:flex;flex-wrap:wrap;gap:var(--ds-marginXS)}
 .diet-chip-wrap{display:inline-flex;max-width:100%;border-radius:var(--ds-borderRadiusLG);background:var(--ds-colorFillTertiary);color:var(--ds-colorTextSecondary)}
-.diet-chip{display:inline-flex;align-items:center;justify-content:center;gap:var(--ds-marginXXS);border:0;border-radius:var(--ds-borderRadiusLG);padding:var(--ds-paddingXXS) var(--ds-paddingSM);min-height:var(--ds-controlHeight);background:transparent;color:inherit;cursor:pointer;font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight);overflow-wrap:anywhere;max-width:100%;transition:background var(--ds-motionDurationMid),color var(--ds-motionDurationMid)}
+.diet-chip{display:inline-flex;align-items:center;justify-content:center;gap:var(--ds-marginXXS);border:0;border-radius:var(--ds-borderRadiusLG);padding:var(--ds-paddingXS);min-height:var(--ds-controlHeight);background:transparent;color:inherit;cursor:pointer;font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight);overflow-wrap:anywhere;max-width:100%;transition:background var(--ds-motionDurationMid),color var(--ds-motionDurationMid)}
 .diet-chip-wrap.is-selected,.diet-inline-form{background:var(--ds-colorPrimaryBg);color:var(--ds-colorPrimaryText);box-shadow:inset 0 0 0 var(--ds-lineWidth) var(--ds-colorPrimaryBorder)}
 .diet-chip .anticon{font-size:var(--ds-fontSizeSM);flex-shrink:0}
 .diet-add{background:var(--ds-colorFillTertiary);color:var(--ds-colorTextSecondary)}
@@ -31,7 +31,7 @@
 .diet-page{max-width:402px;padding-top:env(safe-area-inset-top)}
 
 .diet-sheet{padding-left:var(--ds-paddingXL);padding-right:var(--ds-paddingXL)}
-.diet-chip{min-height:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS))}
+.diet-chip{min-height:0}
 .diet-remove{min-width:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS));min-height:calc(var(--ds-controlHeightLG) + var(--ds-marginXXS))}
 .diet-page{padding-bottom:env(safe-area-inset-bottom)}
 @media(min-width:600px){.diet-page{height:874px;min-height:0;overflow-y:auto;scrollbar-width:none;margin:var(--ds-marginLG) auto;outline:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:var(--ds-borderRadiusLG)}}
@@ -79,7 +79,7 @@
 .mouth-frame-art.nose-triangle::before{clip-path:polygon(50% 0,100% 100%,0 100%);border-radius:0}
 .mouth-frame-teeth{position:absolute;left:0;top:-12px;width:100%;height:40px;pointer-events:none}
 .mouth-frame-tongue{position:absolute;bottom:0;right:0;width:60%;height:var(--ds-paddingXL)}
-.diet-mouth-content{flex:1;width:100%;min-width:0}
+.diet-mouth-content{position:relative;top:-16px;flex:1;width:100%;min-width:0}
 .diet-mouth-content .diet-group h2{color:var(--brand-blueLight)}
 .diet-mouth-content .diet-chip{padding-left:var(--ds-paddingXS);padding-right:var(--ds-paddingXS)}
 .diet-mouth-content .diet-chip-wrap:not(.is-selected),.diet-mouth-content .diet-add{background:color-mix(in srgb,var(--brand-snow) 22%,transparent);color:var(--brand-snow)}
@@ -87,3 +87,15 @@
 .diet-mouth-content .diet-chip-wrap.is-selected{box-shadow:none}
 .diet-mouth-content .diet-inline-error{color:var(--brand-snow)}
 .diet-mouth-action{flex-shrink:0;margin:0;padding:0 calc(var(--ds-paddingXL) + var(--ds-paddingXS))}
+
+/* A continuous configured character carries setup into the preferences frame. */
+.mouth-setup-layer{position:absolute;inset:max(44px,env(safe-area-inset-top)) 0 max(44px,env(safe-area-inset-bottom));display:flex;z-index:2;background:var(--ds-colorBgContainer)}
+.mouth-setup-layer .mouth-setup{height:100%}
+.setup-transition-layer{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+.diet-entering .mouth-frame-art{visibility:hidden}
+.diet-entering .diet-header,.diet-entering .diet-mouth-content,.diet-entering .diet-mouth-action{position:relative;z-index:4}
+.diet-entering .diet-mouth-scene{z-index:4}
+.mouth-frame-configured{background:none;border-radius:0}
+.mouth-frame-configured::before{display:none}
+.mouth-frame-output{position:absolute;inset:0;overflow:visible}
+.mouth-frame-output>svg{display:block;width:100%;height:100%;overflow:visible}

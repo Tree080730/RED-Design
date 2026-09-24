@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-const openDiet=async(page:any)=>{await page.goto('/demo');await page.getByRole('button',{name:'Save mouth and continue'}).click();};
+const openDiet=async(page:any)=>{await page.goto('/demo');await page.getByRole('button',{name:'Save mouth and continue'}).click();await expect(page.locator('.setup-transition-layer')).toHaveCount(0);};
 test('mouth setup uses the light layout and saves before dietary preferences',async({page})=>{
  await page.setViewportSize({width:402,height:874});await page.goto('/demo');
  await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
@@ -112,4 +112,23 @@ test('photo morphs into chewing with a circular thought bubble',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'Check food',exact:true}).click();
  await expect(page.locator('.journey-page')).toHaveClass(/phase-chewing/);
  expect(await page.locator('.journey-mouth-opening').evaluate(e=>e.getAnimations().length)).toBe(0);
+});
+
+
+test('configured mouth opens continuously into preferences and respects reduced motion',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo');
+ await page.getByRole('tab',{name:'Teeth',exact:true}).click();await page.getByRole('button',{name:'Gold tooth',exact:true}).click();
+ await page.getByRole('button',{name:'Save mouth and continue'}).click();
+ await expect(page.locator('.setup-transition-layer > svg')).toHaveCount(1);
+ await expect(page.locator('.diet-mouth-viewport')).toHaveAttribute('inert','');
+ await expect(page.locator('.setup-transition-layer [fill="#FFDB13"]')).toHaveCount(1);
+ await expect(page.locator('.setup-transition-layer')).toHaveCount(0);
+ await expect(page.locator('.mouth-frame-output [fill="#FFDB13"]')).toHaveCount(1);
+ await page.getByRole('button',{name:'Peanut',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Peanut',exact:true})).toHaveAttribute('aria-pressed','true');
+ await page.getByRole('button',{name:'Edit your mouth'}).click();
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.getByRole('button',{name:'Save mouth and continue'}).click();
+ await expect(page.locator('.setup-transition-layer')).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'Peanut',exact:true})).toHaveAttribute('aria-pressed','true');
 });

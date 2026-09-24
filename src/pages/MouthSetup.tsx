@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
-import { MouthPortrait, MouthOptionPreview, useMouthConfig, type MouthConfig } from '../components/MouthConfig';
+import { FinalMouthPortrait, MouthOptionPreview, useMouthConfig, type MouthConfig } from '../components/MouthConfig';
 import './mouth-setup.css';
 const tabs=['Nose','Mouth','Teeth','Tongue','Hair'] as const;
 function FeatureIcon({name}:{name:typeof tabs[number]}){
@@ -22,10 +22,10 @@ export default function MouthSetup({onContinue,onClose}:{onContinue:()=>void;onC
  function palette(key:'insideColor'|'tongueColor'|'hairColor',items:readonly (readonly [string,string])[]){return <div className="mouth-option-row mouth-color-row">{key==='hairColor'&&<button className="mouth-option" aria-label="No hair color" aria-pressed={config.hair==='none'} onClick={()=>setConfig({...config,hair:'none'})}><svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="24" fill="none" stroke="#AAC4FB" strokeWidth="3"/><path d="M10 44L44 10" stroke="#AAC4FB" strokeWidth="3"/></svg></button>}{items.map(([value,label])=><button key={value} className="mouth-option" aria-label={`${label} ${key==='insideColor'?'mouth interior':key==='tongueColor'?'tongue':'hair'}`} aria-pressed={config[key]===value&&(key!=='hairColor'||config.hair!=='none')} onClick={()=>setConfig({...config,[key]:value,...(key==='hairColor'&&config.hair==='none'?{hair:'smooth' as const}:{})})}><span className="mouth-color-swatch" style={{background:value}}/></button>)}</div>;}
  return <main className="mouth-setup" aria-labelledby="mouth-setup-title">
   <header className="mouth-setup-header"><Button type="text" className="mouth-close" aria-label="Back from mouth setup" icon={<LeftOutlined/>} onClick={onClose}/><h1 id="mouth-setup-title">Create your MOUTH</h1></header>
-  <div className="mouth-preview"><MouthPortrait/></div>
+  <div className="mouth-preview"><FinalMouthPortrait/></div>
   <div className="mouth-tabs" role="tablist" aria-label="Mouth features">{tabs.map((t,i)=><button key={t} role="tab" aria-label={t} id={`mouth-tab-${t}`} aria-controls="mouth-config-panel" aria-selected={tab===t} tabIndex={tab===t?0:-1} onClick={()=>setTab(t)} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const next=tabs[(i+(e.key==='ArrowRight'?1:4))%5];setTab(next);document.getElementById(`mouth-tab-${next}`)?.focus();}}}><FeatureIcon name={t}/></button>)}</div>
   <section className="mouth-editor" data-feature={tab} id="mouth-config-panel" role="tabpanel" aria-labelledby={`mouth-tab-${tab}`} key={tab}>
-   {tab==='Nose'&&<><h2>Nose Shape</h2>{choices('nose',[['round','Round nose'],['oval','Oval nose'],['triangle','Triangle nose'],['wide','Wide nose'],['bridge','Bridge nose']],'140 -8 120 100')}<h2>Nostril Shape</h2>{choices('noseDetail',[['lines','Line nostrils'],['dots','Round nostrils'],['stars','Star nostrils'],['slits','Slit nostrils'],['hearts','Heart nostrils']],'158 7 84 70')}</>}
+   {tab==='Nose'&&<><h2>Nose Shape</h2>{choices('nose',[['round','Round nose'],['oval','Oval nose'],['triangle','Triangle nose'],['wide','Wide nose'],['bridge','Bridge nose']],'140 -8 120 100')}<h2>Nose Color</h2>{choices('noseDetail',[['lines','Line nostrils'],['dots','Round nostrils'],['stars','Star nostrils'],['slits','Slit nostrils'],['hearts','Heart nostrils']],'158 7 84 70')}</>}
    {tab==='Mouth'&&<><h2>Mouth Shape</h2>{choices('mouth',[['rounded','Rounded mouth'],['oval','Oval mouth'],['smile','Smile mouth'],['square','Square mouth']],'20 -10 360 300')}<h2>Mouth Color</h2>{palette('insideColor',colors)}</>}
    {tab==='Teeth'&&<><h2>Teeth Style</h2>{choices('teeth',[['classic','Classic teeth'],['buck','Buck teeth'],['gold','Gold tooth'],['decay','Cavity'],['gap','Tooth gap']],'65 20 270 224')}<h2>Teeth Stickers</h2>{choices('sticker',[['heart','Heart sticker'],['star','Star sticker'],['like','Like sticker'],['question','Question sticker'],['none','No sticker']],'60 22 200 166')}</>}
    {tab==='Tongue'&&<><h2>Tongue Shape</h2>{choices('tongue',[['double','Double tongue'],['round','Rounded tongue'],['flat','Flat tongue'],['pointed','Pointed tongue']],'160 45 215 179')}<h2>Tongue Color</h2>{palette('tongueColor',[['#D76568','Rose'],...colors])}</>}
