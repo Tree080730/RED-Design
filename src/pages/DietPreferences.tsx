@@ -7,7 +7,7 @@ import { SimulatedKeyboard } from './SimulatedKeyboard';
 import { MouthFrame } from '../components/MouthFrame';
 import CameraCapture from './CameraCapture';
 import PhotoConfirm from './PhotoConfirm';
-import Analyzing from './Analyzing';
+import MouthSetup from './MouthSetup';
 
 const groups = [
  {key:'allergies',title:'Allergies',options:['Peanut','Tree nuts','Shellfish','Fish','Milk','Egg','Wheat','Soy','Sesame']},
@@ -19,16 +19,17 @@ type Choices = Record<GroupKey,string[]>;
 const emptyChoices=():Choices=>({allergies:[],diet:[],preferences:[]});
 export default function DietPreferences(){
  const [notice,noticeContext]=message.useMessage();
+ const [setup,setSetup]=useState(true);
  const [selected,setSelected]=useState<Choices>(emptyChoices);
  const [custom,setCustom]=useState<Choices>(emptyChoices);
  const [editing,setEditing]=useState<GroupKey|null>(null);
  const [value,setValue]=useState('');const [error,setError]=useState('');
- const [view,setView]=useState<'select'|'confirm'|'camera'|'photo-confirm'|'analyzing'>('select');
+ const [view,setView]=useState<'select'|'confirm'|'camera'|'photo-confirm'>('select');
  const [simulate]=useState(()=>navigator.maxTouchPoints===0);
  const inputRef=useRef<InputRef>(null);
  const formRef=useRef<HTMLFormElement>(null);
  const viewportRef=useRef<HTMLDivElement>(null);
- const goTo=(next:'select'|'confirm'|'camera'|'photo-confirm'|'analyzing')=>{setView(next);requestAnimationFrame(()=>viewportRef.current?.scrollTo({top:0}));};
+ const goTo=(next:'select'|'confirm'|'camera'|'photo-confirm')=>{setView(next);requestAnimationFrame(()=>viewportRef.current?.scrollTo({top:0}));};
  useEffect(()=>{
   if(!editing)return;
   const reveal=()=>revealInput();
@@ -82,11 +83,12 @@ export default function DietPreferences(){
   setEditing(null);setValue('');setError('');
  }
 
+ if(setup)return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype"><MouthSetup onContinue={()=>setSetup(false)} onClose={()=>setSetup(false)}/></div>;
  return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype">
   {noticeContext}
   <div className="diet-viewport diet-mouth-viewport" ref={viewportRef} inert={view!=='select'?true:undefined}>
    <header className="diet-header">
-    <Button type="text" className="diet-back" aria-label="Go back" icon={<LeftOutlined/>} onClick={()=>{if(editing){cancel();return;}if(window.history.length>1)window.history.back();else void notice.info("You're at the first step of this demo.");}}/>
+    <Button type="text" className="diet-back" aria-label="Edit your mouth" icon={<LeftOutlined/>} onClick={()=>{if(editing){cancel();return;}setSetup(true);}}/>
     <h1 id="diet-title">What do you avoid?</h1>
    </header>
    <main className="diet-mouth-scene" aria-labelledby="diet-title">
@@ -109,8 +111,7 @@ export default function DietPreferences(){
    </main>
   </div>}
  {view==='camera'&&<CameraCapture onBack={()=>goTo('select')} onCapture={()=>goTo('photo-confirm')}/>}
- {view==='photo-confirm'&&<PhotoConfirm onBack={()=>goTo('camera')} onRetake={()=>goTo('camera')} onCheck={()=>goTo('analyzing')}/>}
- {view==='analyzing'&&<Analyzing onBack={()=>goTo('photo-confirm')}/>}
+ {view==='photo-confirm'&&<PhotoConfirm onBack={()=>goTo('camera')} onRetake={()=>goTo('camera')}/>}
  {view==='select'&&editing&&simulate&&<SimulatedKeyboard onKey={typeKey} onDone={add} onDismiss={()=>{if(value.trim())add();else cancel();}} onReveal={revealInput}/>}
  </div>;
 }

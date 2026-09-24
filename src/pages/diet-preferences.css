@@ -73,7 +73,11 @@
 .mouth-frame-art{position:absolute;inset:0;z-index:-1;pointer-events:none;background:#FDDECB;border-radius:64px}
 .mouth-frame-art::before{content:"";position:absolute;width:32px;height:24px;top:-12px;left:calc(50% - 16px);border-radius:16px;background:#FDDECB}
 .mouth-frame-cavity{position:absolute;inset:var(--ds-paddingXL);border-radius:40px;background:#FFFFFF;overflow:hidden}
-.mouth-frame-interior{position:absolute;inset:var(--ds-controlHeightLG) 0 var(--ds-paddingLG);background:#930600}
+.mouth-frame-interior{position:absolute;inset:var(--ds-controlHeightLG) 0 var(--ds-paddingLG);background:var(--mouth-interior,#930600)}
+.mouth-frame-art::before{transform:scale(var(--nose-scale,1));transform-origin:center bottom}
+.mouth-frame-art.nose-oval::before{border-radius:50%;height:32px;top:-20px}
+.mouth-frame-art.nose-triangle::before{clip-path:polygon(50% 0,100% 100%,0 100%);border-radius:0}
+.mouth-frame-teeth{position:absolute;left:0;top:-12px;width:100%;height:40px;pointer-events:none}
 .mouth-frame-tongue{position:absolute;bottom:0;right:0;width:60%;height:var(--ds-paddingXL)}
 .diet-mouth-content{flex:1;width:100%;min-width:0}
 .diet-mouth-content .diet-group h2{color:var(--brand-blueLight)}

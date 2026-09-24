@@ -1,20 +1,57 @@
 /* Photo confirm overlays the diet-page container just like the camera page. */
 .confirm-page{position:absolute;inset:0;z-index:4;background:var(--ds-colorBgContainer);overflow:hidden}
-.confirm-header{position:absolute;inset:0 0 auto;height:15.2%;display:flex;align-items:center;justify-content:center;padding-top:env(safe-area-inset-top)}
+.confirm-header{position:absolute;left:0;right:0;top:max(44px,env(safe-area-inset-top));height:44px;display:flex;align-items:center;justify-content:center;padding:0 44px}
 .confirm-header h1{margin:0;color:var(--ds-colorPrimary);font-size:var(--ds-fontSizeHeading3);line-height:var(--ds-lineHeightHeading3);font-weight:var(--ds-fontWeightStrong);white-space:nowrap}
-.confirm-back.ant-btn{position:absolute;left:var(--ds-padding);top:50%;transform:translateY(-50%);width:calc(var(--ds-controlHeightLG) + var(--ds-paddingXS));height:44px;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
+.confirm-back.ant-btn{position:absolute;left:0;top:0;width:44px;height:44px;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
 .confirm-back.ant-btn:hover{background:transparent!important;color:var(--ds-colorTextSecondary)!important}
-.confirm-body{position:absolute;left:0;right:0;top:15.2%;bottom:0;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:calc(var(--ds-paddingXL) * 2);padding:var(--ds-paddingXL) var(--ds-paddingXL) calc(env(safe-area-inset-bottom) + var(--ds-paddingXL))}
-.confirm-photo{aspect-ratio:7/6;border-radius:calc(var(--ds-borderRadiusLG) * 2);background:var(--ds-colorFillTertiary)}
-.confirm-character{position:relative;isolation:isolate;width:62%;aspect-ratio:5/3;align-self:center}
-.confirm-mouth.mouth-frame-art{z-index:0;border-radius:calc(var(--ds-borderRadiusLG) * 4);background:#FDDECB}
-.confirm-mouth.mouth-frame-art::before{width:22px;height:16px;top:-8px;left:calc(50% - 11px);border-radius:calc(var(--ds-borderRadiusLG) + var(--ds-borderRadius))}
-.confirm-mouth .mouth-frame-cavity{inset:var(--ds-paddingSM);border-radius:calc(var(--ds-borderRadiusLG) * 3)}
-.confirm-mouth .mouth-frame-interior{inset:calc(var(--ds-paddingSM) + var(--ds-paddingXS)) 0 var(--ds-paddingSM)}
-.confirm-mouth .mouth-frame-tongue{height:var(--ds-paddingSM)}
-.confirm-actions{display:flex;gap:var(--ds-marginSM)}
-.confirm-actions .ant-btn{height:var(--ds-controlHeightLG);font-size:var(--ds-fontSize)}
+.confirm-body{position:absolute;inset:0;pointer-events:none}
+.confirm-photo{position:absolute;left:var(--ds-paddingSM);right:var(--ds-paddingSM);top:18.85%;height:33%;border-radius:calc(var(--ds-borderRadiusLG) * 2);background:var(--ds-colorFillTertiary)}
+.confirm-character{position:absolute;left:13.5%;width:73%;top:57%;aspect-ratio:550/335}
+.confirm-character svg{display:block;width:100%;height:100%;overflow:visible}
+/* Geometry is animated together by useDroolMotion; these are the static fallback poses. */
+.confirm-drool-strand,.confirm-drool-drop,.confirm-drool-bead{transform-origin:0 0}
+.confirm-drool-drop{transform:translateY(91px)}
+.confirm-actions{position:absolute;left:var(--ds-paddingSM);right:var(--ds-paddingSM);top:81.2%;display:flex;gap:var(--ds-marginSM);pointer-events:auto}
+.confirm-actions .ant-btn{height:var(--ds-controlHeightLG);font-size:var(--ds-fontSizeLG)}
 .confirm-primary.ant-btn{flex:1}
-.confirm-again.ant-btn{flex-basis:calc(var(--ds-controlHeightLG) * 2.3);border-color:var(--ds-colorPrimary);color:var(--ds-colorPrimary)}
+.confirm-again.ant-btn{flex:0 0 28%;border-color:var(--ds-colorPrimary);color:var(--ds-colorPrimary)}
 .confirm-again.ant-btn:hover,.confirm-again.ant-btn:focus-visible{border-color:var(--ds-colorPrimary)!important;background:transparent!important;color:var(--ds-colorPrimary)!important}
 @media(min-width:600px){.confirm-page{border-radius:var(--ds-borderRadiusLG)}}
+
+/* One persistent scene: the face morphs in place while the photo is swallowed. */
+.journey-page{container-type:size}
+.journey-page .confirm-header{z-index:5}
+.journey-character,.journey-face{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.journey-face{overflow:visible}
+.journey-page .confirm-photo{z-index:2;transform-origin:50% 50%}
+.journey-page .confirm-photo{will-change:transform,opacity}
+.journey-page:not(.phase-review) .confirm-actions{pointer-events:none}
+.phase-chewing .confirm-photo,.phase-result .confirm-photo{visibility:hidden}
+.journey-mouth-opening{transform-box:view-box;transition:transform 600ms cubic-bezier(.22,1,.36,1)}
+.journey-mouth-opening:not(.result-yes):not(.result-no){transition:none}
+.journey-mouth-opening.result-yes{transform:scaleY(.65)}
+.journey-mouth-opening.result-no{transform:scaleY(.12)}
+.journey-thought{position:absolute;top:26.8%;left:0;right:0;display:flex;align-items:center;flex-direction:column;gap:var(--ds-marginSM);z-index:3}
+.journey-bubble{position:relative;display:grid;place-items:center;width:100px;height:100px;background:var(--ds-colorBgContainer);border:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:50%;box-shadow:var(--ds-boxShadowSecondary)}
+.journey-bubble::before,.journey-bubble::after{content:"";position:absolute;background:var(--ds-colorBgContainer);border:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:50%;width:14px;height:14px;bottom:-24px;left:45%}
+.journey-bubble::after{width:8px;height:8px;bottom:-40px;left:40%}
+.journey-food{font-size:58px;line-height:1;animation:journey-food-spin 80ms ease-out both}
+@keyframes journey-food-spin{from{transform:translateY(-10px) scaleY(1.08)}to{transform:none}}
+@keyframes journey-thought-in{from{opacity:0;transform:translateY(12px) scale(.92)}to{opacity:1;transform:none}}
+.journey-status{margin:var(--ds-marginXL) 0 0;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
+.journey-result-icon{font-size:44px}
+.journey-bubble.result-yes{color:var(--ds-colorSuccessText);background:var(--ds-colorSuccessBg);border-color:var(--ds-colorSuccessBorder)}
+.journey-bubble.result-no{color:var(--ds-colorErrorText);background:var(--ds-colorErrorBg);border-color:var(--ds-colorErrorBorder)}
+.phase-result .journey-bubble{width:108px;height:108px;background:transparent;border:0;box-shadow:none}
+.phase-result .journey-bubble::before,.phase-result .journey-bubble::after{display:none}
+.journey-result-food{font-size:104px;line-height:1}
+.phase-result .journey-status{margin-top:0}
+.journey-demo-controls{display:flex;flex-direction:column;align-items:center;gap:var(--ds-marginXS);font-size:var(--ds-fontSizeSM);color:var(--ds-colorTextSecondary)}
+.journey-demo-controls>div{display:flex;gap:var(--ds-marginXS)}
+.journey-waterfall-lines{animation:journey-waterfall 1250ms linear infinite}
+.journey-sick-particles{animation:journey-waterfall 1850ms linear infinite}
+.journey-foam{animation:journey-foam-bob 2900ms ease-in-out infinite}
+@keyframes journey-waterfall{from{transform:translateY(0)}to{transform:translateY(200px)}}
+@keyframes journey-foam-bob{0%,100%{transform:translate(0,4px)}45%{transform:translate(-3px,-5px)}75%{transform:translate(2px,-1px)}}
+@media(prefers-reduced-motion:reduce){.journey-waterfall-lines,.journey-sick-particles,.journey-foam{animation:none}}
+@media(prefers-reduced-motion:reduce){.phase-entering .confirm-photo{animation:none;opacity:0}.journey-mouth-opening.is-chewing,.journey-thought,.journey-food{animation:none}.journey-mouth-opening,.journey-page .confirm-actions{transition:none}}
