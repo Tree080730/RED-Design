@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
-const openDiet=async(page:any,url='/demo')=>{await page.goto(url);await page.getByRole('button',{name:'Save mouth and continue'}).click();await expect(page.locator('.setup-transition-layer')).toHaveCount(0);};
+const openDiet=async(page:any,url='/demo?result=can-eat')=>{await page.goto(url);await page.getByRole('button',{name:'Save mouth and continue'}).click();await expect(page.locator('.setup-transition-layer')).toHaveCount(0);};
 test('mouth setup uses the light layout and saves before dietary preferences',async({page})=>{
- await page.setViewportSize({width:402,height:874});await page.goto('/demo');
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo?result=can-eat');
  await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
  for(const label of ['Wide nose','Bridge nose','Slit nostrils','Heart nostrils'])await expect(page.getByRole('button',{name:label,exact:true})).toBeAttached();
  await page.getByRole('button',{name:'Bridge nose',exact:true}).click();await page.getByRole('button',{name:'Heart nostrils',exact:true}).click();
@@ -48,7 +48,7 @@ test('empty choices are not treated as personal match and custom duplicates are 
 test('confirm opens camera page with shutter',async({page})=>{
  await page.setViewportSize({width:402,height:874});await openDiet(page);await page.getByRole('button',{name:'Continue',exact:true}).click();await page.getByRole('button',{name:'Confirm',exact:true}).click();
  await expect(page.getByRole('heading',{name:'What’s on the table?'})).toBeVisible();await expect(page.getByLabel('Camera preview')).toBeVisible();
- await expect(page.locator('.camera-food-preview')).toHaveAttribute('src','/kung-pao-chicken-demo.png');
+ await expect(page.locator('.camera-food-preview')).toHaveAttribute('src','./kung-pao-chicken-demo.png');
  const fixedCameraGeometry=await page.evaluate(()=>{const read=(selector:string)=>{const rect=document.querySelector(selector)!.getBoundingClientRect();return {x:rect.x,y:rect.y,width:rect.width,height:rect.height};};return {viewfinder:read('.camera-viewfinder'),captureArea:read('.camera-capture-area')};});
  const expectFixedCameraGeometry=async()=>expect(await page.evaluate(()=>{const read=(selector:string)=>{const rect=document.querySelector(selector)!.getBoundingClientRect();return {x:rect.x,y:rect.y,width:rect.width,height:rect.height};};return {viewfinder:read('.camera-viewfinder'),captureArea:read('.camera-capture-area')};})).toEqual(fixedCameraGeometry);
  const zoomTwo=page.getByRole('button',{name:'2× zoom'});await zoomTwo.click();await expect(zoomTwo).toHaveText('2x');await expect(zoomTwo).toHaveAttribute('aria-pressed','true');
@@ -130,7 +130,7 @@ test('photo morphs into chewing with a food thought display',async({page})=>{
 
 
 test('configured mouth opens continuously into preferences and respects reduced motion',async({page})=>{
- await page.setViewportSize({width:402,height:874});await page.goto('/demo');
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo?result=can-eat');
  await page.getByRole('tab',{name:'Teeth',exact:true}).click();await page.getByRole('button',{name:'Gold tooth',exact:true}).click();
  await page.getByRole('button',{name:'Save mouth and continue'}).click();
  await expect(page.locator('.setup-transition-layer > svg')).toHaveCount(1);
@@ -271,4 +271,113 @@ test('unknown result keeps chewing and opens the waiter confirmation page',async
  await page.getByRole('button',{name:'Done',exact:true}).click();
  await expect(page.getByRole('heading',{name:'What’s on the table?'})).toBeVisible();
  await expect(page.getByLabel('Camera preview')).toBeVisible();
+});
+
+test('demo entry shows the scenario chooser without a valid result',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo');
+ await expect(page.getByRole('heading',{name:'选择 Demo 场景'})).toBeVisible();
+ await expect(page.getByText('预览 MouthMate 在不同置信度下的反应。',{exact:true})).toBeVisible();
+ for(const title of ['可以吃','不能吃','还不确定'])await expect(page.getByRole('button',{name:new RegExp(`^${title}`)})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)).toBe(false);
+ for(const card of await page.locator('.demo-scenario-card').all()){const box=await card.boundingBox();expect(box!.x).toBeGreaterThanOrEqual(0);expect(box!.x+box!.width).toBeLessThanOrEqual(402);expect(box!.y+box!.height).toBeLessThanOrEqual(874);}
+});
+
+test('choosing Can eat enters the flow with no preselected conditions',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo');
+ await page.getByRole('button',{name:/^可以吃/}).click();
+ await page.waitForURL(/result=can-eat/);
+ await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
+ await page.getByRole('button',{name:'Save mouth and continue'}).click();
+ await expect(page.getByRole('heading',{name:'What do you avoid?'})).toBeVisible();
+ for(const name of ['Peanut','Mild spice'])await expect(page.getByRole('button',{name,exact:true})).toHaveAttribute('aria-pressed','false');
+});
+
+test('choosing Can’t eat enters the flow with Peanut and Mild spice preselected',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo');
+ await page.getByRole('button',{name:/^不能吃/}).click();
+ await page.waitForURL(/result=cannot-eat/);
+ await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
+ await page.getByRole('button',{name:'Save mouth and continue'}).click();
+ for(const name of ['Peanut','Mild spice'])await expect(page.getByRole('button',{name,exact:true})).toHaveAttribute('aria-pressed','true');
+});
+
+test('choosing Not sure yet enters the flow with Peanut and Mild spice preselected',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo');
+ await page.getByRole('button',{name:/^还不确定/}).click();
+ await page.waitForURL(/result=unknown/);
+ await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
+ await page.getByRole('button',{name:'Save mouth and continue'}).click();
+ for(const name of ['Peanut','Mild spice'])await expect(page.getByRole('button',{name,exact:true})).toHaveAttribute('aria-pressed','true');
+});
+
+test('valid result URLs skip the scenario chooser',async({page})=>{
+ await page.setViewportSize({width:402,height:874});
+ for(const param of ['can-eat','cannot-eat','unknown']){
+  await page.goto(`/demo?result=${param}`);
+  await expect(page.getByRole('heading',{name:'选择 Demo 场景'})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
+ }
+});
+
+test('invalid result parameter falls back to the scenario chooser',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo?result=spaghetti');
+ await expect(page.getByRole('heading',{name:'选择 Demo 场景'})).toBeVisible();
+});
+
+test('can-eat result shows the matching title and opens the details page',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await openDiet(page,'/demo?result=can-eat');
+ for(const name of ['Continue','Confirm','Capture photo','Check food'])await page.getByRole('button',{name,exact:true}).click();
+ await expect(page.locator('.journey-page')).toHaveClass(/phase-chewing/);
+ const details=page.getByRole('button',{name:'Checking Details'});await expect(details).toBeVisible({timeout:7000});
+ await expect(page.getByRole('status').filter({hasText:'Can Eat:)'})).toBeVisible();
+ await expect(page.locator('.journey-food-final')).toHaveText('✓');
+ await expect(page.getByRole('button',{name:'Show the waiter'})).toHaveCount(0);
+ await details.click();
+ await expect(page.getByRole('heading',{name:'Why can I eat this?'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Kung Pao Chicken'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'What’s this?'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Why can eat?'})).toBeVisible();
+ await expect(page.getByText('No obvious conflicts found with the food preferences you saved.')).toBeVisible();
+ await expect(page.getByLabel('Matched reasons')).toHaveCount(0);
+ expect(await page.locator('.food-details-page').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+ await page.getByRole('button',{name:'Back to food check result'}).click();
+ await expect(page.getByRole('button',{name:'Checking Details'})).toBeVisible();
+ await expect(page.locator('.journey-page')).toHaveClass(/phase-result/);
+});
+
+test('can-eat details Done returns to the camera page',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await openDiet(page,'/demo?result=can-eat');
+ for(const name of ['Continue','Confirm','Capture photo','Check food'])await page.getByRole('button',{name,exact:true}).click();
+ const details=page.getByRole('button',{name:'Checking Details'});await expect(details).toBeVisible({timeout:7000});
+ await details.click();
+ await page.getByRole('button',{name:'Done',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Capture photo',exact:true})).toBeVisible();
+});
+
+test('cannot-eat details shows the same Done entry',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await openDiet(page,'/demo?result=cannot-eat');
+ for(const name of ['Continue','Confirm','Capture photo','Check food'])await page.getByRole('button',{name,exact:true}).click();
+ const details=page.getByRole('button',{name:'Checking Details'});await expect(details).toBeVisible({timeout:7000});
+ await details.click();
+ const done=page.getByRole('button',{name:'Done',exact:true});await expect(done).toBeVisible();
+ const box=await done.boundingBox();expect(box!.x).toBeGreaterThanOrEqual(16);expect(box!.x+box!.width).toBeLessThanOrEqual(386);
+ await done.click();
+ await expect(page.getByRole('button',{name:'Capture photo',exact:true})).toBeVisible();
+});
+
+test('result page check icon acts as Done and returns to the camera',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await openDiet(page,'/demo?result=cannot-eat');
+ for(const name of ['Continue','Confirm','Capture photo','Check food'])await page.getByRole('button',{name,exact:true}).click();
+ const check=page.getByRole('button',{name:'Done'});await expect(check).toBeVisible({timeout:7000});
+ const box=await check.boundingBox();expect(box!.x+box!.width).toBeLessThanOrEqual(402);expect(box!.y).toBeLessThan(120);
+ await check.click();
+ await expect(page.getByRole('button',{name:'Capture photo',exact:true})).toBeVisible();
+});
+
+test('mouth setup back returns to the demo scenario chooser',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await page.goto('/demo?result=can-eat');
+ await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
+ await page.getByRole('button',{name:'Back from mouth setup'}).click();
+ await page.waitForURL(/\/demo$/);
+ await expect(page.getByRole('heading',{name:'选择 Demo 场景'})).toBeVisible();
 });

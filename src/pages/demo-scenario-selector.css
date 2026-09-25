@@ -1,0 +1,14 @@
+.demo-scenario-page{display:flex;flex-direction:column;min-height:100dvh;background:var(--ds-colorBgContainer);max-width:402px;margin:0 auto;position:relative;box-sizing:border-box;gap:var(--ds-marginLG);padding:calc(env(safe-area-inset-top) + var(--ds-paddingXL)) 16px calc(env(safe-area-inset-bottom) + var(--ds-paddingXL))}
+.demo-scenario-header{display:flex;flex-direction:column;gap:var(--ds-marginXS)}
+.demo-scenario-header h1{margin:0;color:var(--ds-colorPrimary);font-size:var(--ds-fontSizeHeading3);line-height:var(--ds-lineHeightHeading3);font-weight:var(--ds-fontWeightStrong)}
+.demo-scenario-header p{margin:0;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight)}
+.demo-scenario-list{display:flex;flex-direction:column;gap:var(--ds-marginSM)}
+.demo-scenario-card{box-sizing:border-box;display:flex;width:100%;min-height:76px;align-items:center;justify-content:space-between;gap:var(--ds-marginSM);padding:var(--ds-padding) var(--ds-paddingLG);border:1px solid transparent;border-radius:calc(var(--ds-borderRadiusLG) * 2);background:var(--ds-colorBgLayout);color:var(--ds-colorText);font:inherit;text-align:left;cursor:pointer;transition:background-color var(--ds-motionDurationFast),border-color var(--ds-motionDurationFast)}
+.demo-scenario-card:active{background:var(--ds-colorPrimaryBg)}
+.demo-scenario-card:focus-visible{outline:2px solid var(--ds-colorPrimary);outline-offset:2px}
+.demo-scenario-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.demo-scenario-title{display:flex;align-items:center;gap:var(--ds-marginXS);font-size:var(--ds-fontSizeLG);line-height:var(--ds-lineHeightLG);font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorText)}
+.demo-scenario-description{color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeSM);line-height:var(--ds-lineHeightSM)}
+.demo-scenario-arrow{flex-shrink:0;color:var(--ds-colorTextTertiary);font-size:var(--ds-fontSizeLG)}
+.demo-scenario-note{margin:auto 0 0;color:var(--ds-colorTextTertiary);font-size:var(--ds-fontSizeSM);line-height:var(--ds-lineHeightSM)}
+@media(min-width:600px){.demo-scenario-page{height:874px;min-height:0;overflow-y:auto;scrollbar-width:none;margin:var(--ds-marginLG) auto;outline:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:var(--ds-borderRadiusLG);padding-top:var(--ds-paddingXL)}}

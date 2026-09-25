@@ -17,6 +17,11 @@ function FeatureIcon({name}:{name:typeof tabs[number]}){
 }
 const colors=[['#930600','Deep red'],['#E36165','Coral'],['#914D28','Cocoa'],['#70433D','Brown'],['#723045','Plum']] as const;
 export default function MouthSetup({onContinue,onClose,entering,onEntered}:{onContinue:()=>void;onClose?:()=>void;entering?:boolean;onEntered?:()=>void}){
+ const backToScenarioSelector=()=>{
+  const nextUrl=new URL(window.location.href);
+  nextUrl.searchParams.delete('result');
+  window.location.assign(nextUrl.toString());
+ };
  const {config,setConfig}=useMouthConfig();const [tab,setTab]=useState<typeof tabs[number]>('Nose');
  const rootRef=useRef<HTMLElement>(null);
  useLayoutEffect(()=>{
@@ -53,7 +58,7 @@ export default function MouthSetup({onContinue,onClose,entering,onEntered}:{onCo
  function choices<K extends keyof MouthConfig>(key:K,items:readonly (readonly [MouthConfig[K],string])[],viewBox?:string){return <div className="mouth-option-row">{items.map(([value,label])=><button className="mouth-option" key={String(value)} aria-label={label} aria-pressed={config[key]===value} onClick={()=>setConfig({...config,[key]:value})}><MouthOptionPreview patch={{[key]:value}} viewBox={viewBox}/></button>)}</div>;}
  function palette(key:'insideColor'|'tongueColor'|'hairColor',items:readonly (readonly [string,string])[]){return <div className="mouth-option-row mouth-color-row">{key==='hairColor'&&<button className="mouth-option" aria-label="No hair color" aria-pressed={config.hair==='none'} onClick={()=>setConfig({...config,hair:'none'})}><svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="24" fill="none" stroke="#AAC4FB" strokeWidth="3"/><path d="M10 44L44 10" stroke="#AAC4FB" strokeWidth="3"/></svg></button>}{items.map(([value,label])=><button key={value} className="mouth-option" aria-label={`${label} ${key==='insideColor'?'mouth interior':key==='tongueColor'?'tongue':'hair'}`} aria-pressed={config[key]===value&&(key!=='hairColor'||config.hair!=='none')} onClick={()=>setConfig({...config,[key]:value,...(key==='hairColor'&&config.hair==='none'?{hair:'smooth' as const}:{})})}><span className="mouth-color-swatch" style={{background:value}}/></button>)}</div>;}
  return <main className={`mouth-setup ${entering?'mouth-setup-arriving':''}`} inert={entering?true:undefined} aria-labelledby="mouth-setup-title" ref={rootRef}>
-  <header className="mouth-setup-header app-page-header"><Button type="text" className="mouth-close" aria-label="Back from mouth setup" icon={<LeftOutlined/>} onClick={onClose}/><h1 id="mouth-setup-title">Create your MOUTH</h1></header>
+  <header className="mouth-setup-header app-page-header"><Button type="text" className="mouth-close" aria-label="Back from mouth setup" icon={<LeftOutlined/>} onClick={backToScenarioSelector}/><h1 id="mouth-setup-title">Create your MOUTH</h1></header>
   <div className="mouth-preview"><FinalMouthPortrait/></div>
   <div className="mouth-tabs" role="tablist" aria-label="Mouth features">{tabs.map((t,i)=><button key={t} role="tab" aria-label={t} id={`mouth-tab-${t}`} aria-controls="mouth-config-panel" aria-selected={tab===t} tabIndex={tab===t?0:-1} onClick={()=>setTab(t)} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const next=tabs[(i+(e.key==='ArrowRight'?1:4))%5];setTab(next);document.getElementById(`mouth-tab-${next}`)?.focus();}}}><FeatureIcon name={t}/></button>)}</div>
   <section className="mouth-editor" data-feature={tab} id="mouth-config-panel" role="tabpanel" aria-labelledby={`mouth-tab-${tab}`} key={tab}>

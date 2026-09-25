@@ -14,3 +14,5 @@
 .food-details-tags span{padding:var(--ds-paddingXS);border-radius:var(--ds-borderRadiusLG);background:var(--ds-colorPrimaryBg);color:var(--ds-colorPrimary);font-size:var(--ds-fontSizeSM);line-height:var(--ds-lineHeightSM)}
 @keyframes food-details-enter{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.food-details-page{animation:none}}
+.food-details-actions{margin-top:calc(var(--ds-marginXL) + var(--ds-marginLG))}
+.food-details-actions .ant-btn{height:var(--ds-controlHeightLG);font-size:var(--ds-fontSizeLG);font-weight:var(--ds-fontWeightStrong)}

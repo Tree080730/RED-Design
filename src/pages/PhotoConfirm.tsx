@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from 'antd';
-import { LeftOutlined } from '@ant-design/icons';
+import { CheckOutlined, LeftOutlined } from '@ant-design/icons';
 import './photo-confirm.css';
 import { useDroolMotion } from './useDroolMotion';
 import { JourneyMouth } from './JourneyMouth';
@@ -123,6 +123,7 @@ export default function PhotoConfirm({onBack,onRetake,captureBounds,choices}:Pho
   <header className="confirm-header app-page-header">
    <Button type="text" className="confirm-back" aria-label={reviewing?'Back to camera':'Back to photo'} icon={<LeftOutlined/>} onClick={reviewing?onBack:reset}/>
    <h1 id="photo-confirm-title">{reviewing?'Look good?':'Checking your food…'}</h1>
+   {(result==='yes'||result==='no')&&<Button type="text" className="confirm-done" aria-label="Done" icon={<CheckOutlined/>} onClick={onRetake}/>}
   </header>
   <p className="confirm-review-guidance" aria-hidden={!reviewing} style={{opacity:motion.actions,transform:`translateY(${(1-motion.actions)*8}px)`}}>Make sure the photo is clear.</p>
   <div className="confirm-body">
@@ -135,7 +136,7 @@ export default function PhotoConfirm({onBack,onRetake,captureBounds,choices}:Pho
     <Button size="large" className="confirm-again" onClick={retake}>Again</Button>
    </div>
   </div>
-  {(phase==='chewing'||phase==='result')&&<section className={`journey-thought ${result==='no'?'journey-thought-cannot':result==='unknown'?'journey-thought-unknown':''}`} aria-label="Food check demonstration" style={{opacity:motion.bubble,transform:`translateY(${(1-motion.bubble)*12}px) scale(${.96+.04*motion.bubble})`}}>
+  {(phase==='chewing'||phase==='result')&&<section className={`journey-thought ${result==='no'?'journey-thought-cannot':result==='unknown'?'journey-thought-unknown':result==='yes'?'journey-thought-yes':''}`} aria-label="Food check demonstration" style={{opacity:motion.bubble,transform:`translateY(${(1-motion.bubble)*12}px) scale(${.96+.04*motion.bubble})`}}>
    <div className={`journey-bubble ${result?`result-${result}`:''}`}>
     <span className={`journey-food${result?' journey-food-previous':''}`} key={food} aria-hidden="true">{foods[food]}</span>
     {result&&<span className="journey-food journey-food-final" aria-hidden="true">{result==='no'?resultEmoji:result==='unknown'?'❓':'✓'}</span>}
@@ -148,7 +149,10 @@ export default function PhotoConfirm({onBack,onRetake,captureBounds,choices}:Pho
     <p className="journey-result-title" role="status">Not sure yet</p>
     <p className="journey-result-guidance">Need to check with the waiter</p>
     <div className="journey-result-action"><Button type="primary" onClick={()=>setShowWaiter(true)}>Show the waiter</Button></div>
-   </>:<p className="journey-status" role="status">{result==='yes'?'Can eat':'AI is analyzing ingredients…'}</p>}
+   </>:result==='yes'?<>
+    <p className="journey-result-title" role="status">Can Eat:)</p>
+    <button type="button" className="journey-result-details" onClick={()=>setShowDetails(true)}>Checking Details <span aria-hidden="true">›</span></button>
+   </>:<p className="journey-status" role="status">AI is analyzing ingredients…</p>}
   </section>}
- </main>{showDetails&&<FoodCheckDetails choices={choices} onBack={()=>setShowDetails(false)}/>} {showWaiter&&<WaiterCheck onBack={()=>setShowWaiter(false)} onDone={onRetake}/>}</>;
+ </main>{showDetails&&<FoodCheckDetails choices={choices} variant={result==='yes'?'can-eat':'cannot-eat'} onBack={()=>setShowDetails(false)} onDone={onRetake}/>} {showWaiter&&<WaiterCheck onBack={()=>setShowWaiter(false)} onDone={onRetake}/>}</>;
 }
