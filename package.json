@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "npm@10.9.8",
+  "engines": {
+    "node": "22.23.2",
+    "npm": "10.9.8"
+  },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
@@ -10,7 +15,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "playwright test",
     "check:tokens": "tsx scripts/check-tokens.ts",
-    "check:contrast": "tsx scripts/check-contrast.ts"
+    "check:contrast": "tsx scripts/check-contrast.ts",
+    "verify": "npm run typecheck && npm run check:tokens && npm run check:contrast && npm run build && npm test"
   },
   "dependencies": {
     "@ant-design/icons": "6.0.0",
