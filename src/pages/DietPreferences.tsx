@@ -9,23 +9,21 @@ import CameraCapture from './CameraCapture';
 import PhotoConfirm from './PhotoConfirm';
 import MouthSetup from './MouthSetup';
 import { SetupTransition } from './SetupTransition';
-
-const groups = [
- {key:'allergies',title:'Allergies',options:['Peanut','Tree nuts','Shellfish','Fish','Milk','Egg','Wheat','Soy','Sesame']},
- {key:'diet',title:'Dietary restrictions',options:['Vegetarian','Vegan','No pork','No beef']},
- {key:'preferences',title:'Preferences',options:['Mild spice','No cilantro','No organ meat']},
-] as const;
-type GroupKey = typeof groups[number]['key'];
-type Choices = Record<GroupKey,string[]>;
-const emptyChoices=():Choices=>({allergies:[],diet:[],preferences:[]});
+import { dietGroups as groups, emptyDietChoices, type DietChoices as Choices, type DietGroupKey as GroupKey } from './dietChoices';
 export default function DietPreferences(){
+ const resultParam=new URLSearchParams(window.location.search).get('result');
+ const personalizedDemo=resultParam==='cannot-eat'||resultParam==='unknown';
  const [notice,noticeContext]=message.useMessage();
  const [setup,setSetup]=useState(true);
+ const [captureBounds,setCaptureBounds]=useState<DOMRect|null>(null);
  const [entering,setEntering]=useState(false);
+ const [setupEntering,setSetupEntering]=useState(false);
+ const finishSetupEntry=useCallback(()=>setSetupEntering(false),[]);
+ const reenterSetup=useCallback(()=>{setSetupEntering(!matchMedia('(prefers-reduced-motion: reduce)').matches);setSetup(true);},[]);
  const finishEntry=useCallback(()=>{setEntering(false);setSetup(false);},[]);
  const continueSetup=()=>{if(entering)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){setSetup(false);return;}setEntering(true);};
- const [selected,setSelected]=useState<Choices>(emptyChoices);
- const [custom,setCustom]=useState<Choices>(emptyChoices);
+ const [selected,setSelected]=useState<Choices>(()=>personalizedDemo?{allergies:['Peanut'],diet:[],preferences:['Mild spice']}:emptyDietChoices());
+ const [custom,setCustom]=useState<Choices>(emptyDietChoices);
  const [editing,setEditing]=useState<GroupKey|null>(null);
  const [value,setValue]=useState('');const [error,setError]=useState('');
  const [view,setView]=useState<'select'|'confirm'|'camera'|'photo-confirm'>('select');
@@ -90,10 +88,10 @@ export default function DietPreferences(){
 
  return <div className="diet-page" lang="en" aria-label="iPhone 17 Pro app prototype">
   {noticeContext}
-  {setup&&<div className="mouth-setup-layer" inert={entering?true:undefined}><MouthSetup onContinue={continueSetup} onClose={()=>setSetup(false)}/></div>}
+  {setup&&<div className="mouth-setup-layer" inert={entering?true:undefined}><MouthSetup onContinue={continueSetup} onClose={()=>{setSetupEntering(false);setSetup(false);}} entering={setupEntering} onEntered={finishSetupEntry}/></div>}
   {entering&&<SetupTransition onComplete={finishEntry}/>}
   <div className={`diet-viewport diet-mouth-viewport ${entering?'diet-entering':''}`} style={{display:setup&&!entering?'none':undefined}} ref={viewportRef} inert={view!=='select'||entering?true:undefined}>
-   <header className="diet-header">
+   <header className="diet-header app-page-header">
     <Button type="text" className="diet-back" aria-label="Edit your mouth" icon={<LeftOutlined/>} onClick={()=>{if(editing){cancel();return;}setSetup(true);}}/>
     <h1 id="diet-title">What do you avoid?</h1>
    </header>
@@ -112,12 +110,13 @@ export default function DietPreferences(){
    <button type="button" className="diet-confirm-backdrop" aria-label="Close confirmation" onClick={()=>goTo('select')}/>
    <main className="diet-sheet diet-confirm-sheet" aria-labelledby="confirm-title">
   <h1 id="confirm-title" className="diet-confirm-title">Confirm your preferences</h1>
-  {count?<>{groups.map(g=><section className="diet-group" key={g.key} aria-labelledby={`confirm-${g.key}`}><h2 id={`confirm-${g.key}`}>{g.title}</h2>{selected[g.key].length?<div className="diet-chips">{selected[g.key].map(label=><span className="diet-chip-wrap is-selected is-static" key={label}><span className="diet-chip">{label}</span></span>)}</div>:<p className="diet-none">None selected</p>}</section>)}<p className="diet-review-note">We'll save these preferences together for future food checks.</p></>:<p className="diet-empty">You can explore without preferences. Add your food requirements before getting a personalized match.</p>}
+  {!!count&&<p className="diet-review-note">We'll save these preferences together for future food checks.</p>}
+  {count?<>{groups.map(g=><section className="diet-group" key={g.key} aria-labelledby={`confirm-${g.key}`}><h2 id={`confirm-${g.key}`}>{g.title}</h2>{selected[g.key].length?<div className="diet-chips">{selected[g.key].map(label=><span className="diet-chip-wrap is-selected is-static" key={label}><span className="diet-chip">{label}</span></span>)}</div>:<p className="diet-none">None selected</p>}</section>)}</>:<p className="diet-empty">You can explore without preferences. Add your food requirements before getting a personalized match.</p>}
   <div className="diet-bottom"><Button type="primary" size="large" className="diet-continue" onClick={()=>goTo('camera')}>Confirm</Button></div>
    </main>
   </div>}
- {view==='camera'&&<CameraCapture onBack={()=>goTo('select')} onCapture={()=>goTo('photo-confirm')}/>}
- {view==='photo-confirm'&&<PhotoConfirm onBack={()=>goTo('camera')} onRetake={()=>goTo('camera')}/>}
+ {view==='camera'&&<CameraCapture onBack={()=>goTo('select')} onCapture={bounds=>{setCaptureBounds(bounds);goTo('photo-confirm');}} onEditMouth={reenterSetup}/>}
+ {view==='photo-confirm'&&<PhotoConfirm choices={selected} captureBounds={captureBounds} onBack={()=>goTo('camera')} onRetake={()=>goTo('camera')}/>}
  {view==='select'&&editing&&simulate&&<SimulatedKeyboard onKey={typeKey} onDone={add} onDismiss={()=>{if(value.trim())add();else cancel();}} onReveal={revealInput}/>}
  </div>;
 }

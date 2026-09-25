@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 // Sample a damped spring continuously rather than easing between pose changes.
-export function useDroolMotion(){
+export function useDroolMotion(enabled=true){
  const ref=useRef<HTMLDivElement>(null);
  useEffect(()=>{
   const root=ref.current;
@@ -10,7 +10,7 @@ export function useDroolMotion(){
   let animations:Animation[]=[];
   const start=()=>{
    animations.forEach(animation=>animation.cancel());animations=[];
-   if(media.matches)return;
+   if(!enabled||media.matches)return;
    const strand:Keyframe[]=[],drop:Keyframe[]=[],bead:Keyframe[]=[];
    const seconds=4.2,steps=504,dt=seconds/steps;
    let stretch=1;
@@ -42,6 +42,6 @@ export function useDroolMotion(){
   };
   start();media.addEventListener('change',start);
   return ()=>{animations.forEach(animation=>animation.cancel());media.removeEventListener('change',start);};
- },[]);
+ },[enabled]);
  return ref;
 }

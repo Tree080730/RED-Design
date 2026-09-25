@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { Button } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import './analyzing.css';
+import { demoFood } from './demoFood';
 
 type AnalyzingProps={onBack:()=>void};
 
-const emojis=['🥗','🍕','🍔','🌮','🍜','🍎','🥑','🍞','🧀','🥕','🍇','🍣'];
+const emojis=demoFood.scanEmojis;
 const statuses=['Reading the ingredients…','Matching your preferences…','Checking for allergens…','Almost done…'];
 
 export default function Analyzing({onBack}:AnalyzingProps){
@@ -24,7 +25,7 @@ export default function Analyzing({onBack}:AnalyzingProps){
  },[]);
  return <>
   <main className="analyzing-page" aria-labelledby="analyzing-title">
-   <header className="analyzing-header">
+   <header className="analyzing-header app-page-header">
     <Button type="text" className="analyzing-back" aria-label="Back to photo" icon={<LeftOutlined/>} onClick={onBack}/>
     <h1 id="analyzing-title">Checking your food…</h1>
    </header>

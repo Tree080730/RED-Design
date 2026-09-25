@@ -1,0 +1,9 @@
+/* Touch prototype: controls never show a hover state.
+   antd drives every button's hover via per-button CSS variables, so mapping the
+   hover tokens back to their resting values neutralizes hover for all buttons —
+   including any added later — without re-declaring each button's palette. */
+.diet-page .ant-btn{
+  --ant-btn-bg-color-hover: var(--ant-btn-bg-color) !important;
+  --ant-btn-text-color-hover: var(--ant-btn-text-color) !important;
+  --ant-btn-border-color-hover: var(--ant-btn-border-color) !important;
+}

@@ -8,6 +8,8 @@ import DietPreferences from './pages/DietPreferences';
 import { MouthConfigProvider } from './components/MouthConfig';
 import 'antd/dist/reset.css';
 import './styles/global.css';
+import './styles/page-header.css';
+import './styles/no-hover.css';
 if (window.location.pathname.startsWith('/demo')) { document.documentElement.lang = 'en'; document.title = 'Food Passport · iPhone 17 Pro'; }
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode><ConfigProvider theme={brandTheme}><AntApp><TokenProvider>{window.location.pathname.startsWith('/demo')?<MouthConfigProvider><DietPreferences/></MouthConfigProvider>:<App />}</TokenProvider></AntApp></ConfigProvider></React.StrictMode>,

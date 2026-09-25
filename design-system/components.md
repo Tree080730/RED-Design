@@ -14,10 +14,16 @@ Button、Tabs、Checkbox、Radio、Input、Switch、Modal 直接使用 antd 6.0.
 | FoodSticker | 样例 SVG + className → 贴纸 | 原创面条示意，非实时生成 |
 | CharacterLab（AvatarBuilder.tsx） | 编辑草稿／已保存配置与结果选择 → 头像预览和动画样例 | 保存应用；取消回退；状态与外观分离，离开取消计时 |
 | TokenProvider | theme.useToken → CSS 变量 | 单一运行时来源，不复制刻度 |
+| FoodCheckDetails | 三类已选条件 + Demo 依据 → 结果原因、依据来源与未知项 | 过敏、饮食限制、偏好按优先级展示；未知信息不转为匹配或冲突；固定显示 Demo 标识 |
+| WaiterCheck | 未知食物照片 + 可编辑的结构化问题 → 用户英文预览与店员多语言沟通卡 | 不显示推断菜名或结果标签；照片与译文同卡；标题右侧进入语言选择页；底部确认由店员操作 |
 
 人物 v0.2 字段：skin、hair（wave / crop / bob / curly / ponytail / bald）、hairColor、shirt、glasses、glassesShape、face、body、outfit、background。Mood：idle、eating、match、conflict、unknown。详见 [人物规范](./avatar.md)。
 
 ## 交互
+
+- `/demo` 产品顶栏统一使用 `app-page-header`：固定 44px 高度，安全区单独计算；标题水平、垂直居中，两侧预留对称空间，长标题单行省略。嘴部配置、喜好设置、拍摄、照片确认和分析页面共用 `src/styles/page-header.css`，以这些业务页面作为实际展示入口。
+- 不可食用结果的 `Checking Details` 是可聚焦按钮；详情页在结果流程内部切换，返回时保留原结果状态，不重新播放检查动画。
+- `Show the waiter` 右上角语言入口打开独立选择页；切换中文或日文只改变店员卡片和确认按钮，`FOR YOU` 始终保留英文。
 
 - 沟通卡 Modal 可打开、关闭；键盘可操作，沿用 Ant Design 焦点行为。
 - 色板点击复制十六进制值；剪贴板不可用时显示颜色值，不声称复制成功。

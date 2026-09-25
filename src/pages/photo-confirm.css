@@ -2,50 +2,68 @@
 .confirm-page{position:absolute;inset:0;z-index:4;background:var(--ds-colorBgContainer);overflow:hidden}
 .confirm-header{position:absolute;left:0;right:0;top:max(44px,env(safe-area-inset-top));height:44px;display:flex;align-items:center;justify-content:center;padding:0 44px}
 .confirm-header h1{margin:0;color:var(--ds-colorPrimary);font-size:var(--ds-fontSizeHeading3);line-height:var(--ds-lineHeightHeading3);font-weight:var(--ds-fontWeightStrong);white-space:nowrap}
-.confirm-back.ant-btn{position:absolute;left:0;top:0;width:44px;height:44px;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
-.confirm-back.ant-btn:hover{background:transparent!important;color:var(--ds-colorTextSecondary)!important}
+.confirm-back.ant-btn{position:absolute;left:0;top:0;width:44px;height:44px;--ant-btn-text-color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
 .confirm-body{position:absolute;inset:0;pointer-events:none}
-.confirm-photo{position:absolute;left:var(--ds-paddingSM);right:var(--ds-paddingSM);top:18.85%;height:33%;border-radius:calc(var(--ds-borderRadiusLG) * 2);background:var(--ds-colorFillTertiary)}
+.confirm-photo{position:absolute;left:var(--ds-paddingSM);right:var(--ds-paddingSM);top:18.85%;height:33%;border-radius:calc(var(--ds-borderRadiusLG) * 2);background-color:var(--ds-colorFillTertiary);background-position:center;background-size:cover}
 .confirm-character{position:absolute;left:13.5%;width:73%;top:57%;aspect-ratio:550/335}
 .confirm-character svg{display:block;width:100%;height:100%;overflow:visible}
 /* Geometry is animated together by useDroolMotion; these are the static fallback poses. */
 .confirm-drool-strand,.confirm-drool-drop,.confirm-drool-bead{transform-origin:0 0}
-.confirm-drool-drop{transform:translateY(91px)}
+.confirm-drool-strand{transform:scale(1.58114,.098901)}
+.confirm-drool-drop{transform:translateY(9px)}
 .confirm-actions{position:absolute;left:var(--ds-paddingSM);right:var(--ds-paddingSM);top:81.2%;display:flex;gap:var(--ds-marginSM);pointer-events:auto}
 .confirm-actions .ant-btn{height:var(--ds-controlHeightLG);font-size:var(--ds-fontSizeLG)}
 .confirm-primary.ant-btn{flex:1}
-.confirm-again.ant-btn{flex:0 0 28%;border-color:var(--ds-colorPrimary);color:var(--ds-colorPrimary)}
-.confirm-again.ant-btn:hover,.confirm-again.ant-btn:focus-visible{border-color:var(--ds-colorPrimary)!important;background:transparent!important;color:var(--ds-colorPrimary)!important}
+.confirm-again.ant-btn{flex:0 0 28%;--ant-btn-border-color:var(--ds-colorPrimary);--ant-btn-text-color:var(--ds-colorPrimary)}
 @media(min-width:600px){.confirm-page{border-radius:var(--ds-borderRadiusLG)}}
 
 /* One persistent scene: the face morphs in place while the photo is swallowed. */
 .journey-page{container-type:size}
 .journey-page .confirm-header{z-index:5}
 .journey-character,.journey-face{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.journey-face{overflow:visible}
+.journey-face{isolation:isolate;overflow:visible}
+.journey-shared-mouth{inset:0;z-index:0;background:none}
+.journey-shared-mouth .mouth-frame-output,.journey-shared-mouth .mouth-frame-output>svg{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible}
+.journey-effects{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%;overflow:visible}
 .journey-page .confirm-photo{z-index:2;transform-origin:50% 50%}
 .journey-page .confirm-photo{will-change:transform,opacity}
 .journey-page:not(.phase-review) .confirm-actions{pointer-events:none}
 .phase-chewing .confirm-photo,.phase-result .confirm-photo{visibility:hidden}
-.journey-mouth-opening{transform-box:view-box;transition:transform 600ms cubic-bezier(.22,1,.36,1)}
-.journey-mouth-opening:not(.result-yes):not(.result-no){transition:none}
-.journey-mouth-opening.result-yes{transform:scaleY(.65)}
-.journey-mouth-opening.result-no{transform:scaleY(.12)}
-.journey-thought{position:absolute;top:26.8%;left:0;right:0;display:flex;align-items:center;flex-direction:column;gap:var(--ds-marginSM);z-index:3}
-.journey-bubble{position:relative;display:grid;place-items:center;width:100px;height:100px;background:var(--ds-colorBgContainer);border:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:50%;box-shadow:var(--ds-boxShadowSecondary)}
-.journey-bubble::before,.journey-bubble::after{content:"";position:absolute;background:var(--ds-colorBgContainer);border:var(--ds-lineWidth) solid var(--ds-colorBorderSecondary);border-radius:50%;width:14px;height:14px;bottom:-24px;left:45%}
-.journey-bubble::after{width:8px;height:8px;bottom:-40px;left:40%}
-.journey-food{font-size:58px;line-height:1;animation:journey-food-spin 80ms ease-out both}
+.journey-thought{position:absolute;top:26.8%;left:0;right:0;display:flex;align-items:center;flex-direction:column;gap:var(--ds-marginSM);z-index:3;transition:top 520ms cubic-bezier(.22,1,.36,1)}
+.journey-bubble{position:relative;display:grid;place-items:center;width:100px;height:100px;background:transparent;transition:width 520ms cubic-bezier(.22,1,.36,1),height 520ms cubic-bezier(.22,1,.36,1)}
+.journey-food{font-size:104px;line-height:1;animation:journey-food-spin 80ms ease-out both}
 @keyframes journey-food-spin{from{transform:translateY(-10px) scaleY(1.08)}to{transform:none}}
+@keyframes journey-result-food-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(8px) scale(.84)}}
+@keyframes journey-result-food-in{0%{opacity:0;transform:translateY(-12px) scale(.82)}70%{opacity:1;transform:translateY(0) scale(1.04)}100%{opacity:1;transform:none}}
+@keyframes journey-result-copy-in{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
 @keyframes journey-thought-in{from{opacity:0;transform:translateY(12px) scale(.92)}to{opacity:1;transform:none}}
 .journey-status{margin:var(--ds-marginXL) 0 0;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
 .journey-result-icon{font-size:44px}
 .journey-bubble.result-yes{color:var(--ds-colorSuccessText);background:var(--ds-colorSuccessBg);border-color:var(--ds-colorSuccessBorder)}
 .journey-bubble.result-no{color:var(--ds-colorErrorText);background:var(--ds-colorErrorBg);border-color:var(--ds-colorErrorBorder)}
-.phase-result .journey-bubble{width:108px;height:108px;background:transparent;border:0;box-shadow:none}
-.phase-result .journey-bubble::before,.phase-result .journey-bubble::after{display:none}
-.journey-result-food{font-size:104px;line-height:1}
+.phase-result .journey-bubble{width:100px;height:100px;background:transparent;border:0;box-shadow:none}
+.phase-result .journey-food-previous,.phase-result .journey-food-final{position:absolute;inset:auto;animation-duration:360ms;animation-fill-mode:both;animation-timing-function:cubic-bezier(.4,0,.2,1)}
+.phase-result .journey-food-previous{font-size:104px;animation-name:journey-result-food-out}
+.phase-result .journey-food-final{font-size:104px;animation-name:journey-result-food-in;animation-duration:560ms;animation-delay:100ms;animation-timing-function:cubic-bezier(.22,1,.36,1)}
 .phase-result .journey-status{margin-top:0}
+.phase-result .journey-status{animation:journey-result-copy-in 440ms 280ms cubic-bezier(.22,1,.36,1) both}
+.phase-result .journey-thought-cannot,.phase-result .journey-thought-unknown{top:24.82%;gap:0}
+.phase-result .journey-thought-cannot .journey-bubble,.phase-result .journey-thought-unknown .journey-bubble{width:104px;height:104px}
+.phase-result .journey-thought-cannot .journey-food,.phase-result .journey-thought-unknown .journey-food{font-size:104px}
+.journey-result-title{margin:22px 0 0;color:var(--ds-colorPrimary);font-size:32px;line-height:40px;font-weight:var(--ds-fontWeightStrong);transform:scaleX(1.064)}
+.phase-result .journey-result-title{animation:journey-result-copy-in 440ms 280ms cubic-bezier(.22,1,.36,1) both}
+.journey-result-details{position:relative;left:-2px;display:flex;align-items:center;gap:var(--ds-marginXS);margin-top:6px;padding:0;border:0;background:transparent;color:var(--brand-hare);font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight);transform:scaleX(1.033);cursor:pointer}
+.phase-result .journey-result-details{animation:journey-result-copy-in 440ms 400ms cubic-bezier(.22,1,.36,1) both}
+.journey-result-details:focus-visible{outline:var(--ds-lineWidthFocus) solid var(--ds-colorPrimary);outline-offset:var(--ds-controlOutlineWidth)}
+.journey-result-details>span{font-size:var(--ds-fontSizeLG);line-height:1;transform:translateY(-1px)}
+.journey-result-guidance{margin:6px 0 0;color:var(--brand-hare);font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight)}
+.phase-result .journey-result-guidance{animation:journey-result-copy-in 440ms 400ms cubic-bezier(.22,1,.36,1) both}
+.journey-result-reasons{display:flex;justify-content:center;flex-wrap:wrap;max-width:300px;gap:var(--ds-marginXS);margin-top:14px}
+.phase-result .journey-result-reasons{animation:journey-result-copy-in 440ms 520ms cubic-bezier(.22,1,.36,1) both}
+.journey-result-reason{padding:var(--ds-paddingXS);border-radius:var(--ds-borderRadiusLG);background:var(--ds-colorPrimaryBg);color:var(--ds-colorPrimary);font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight)}
+.journey-result-action{margin-top:14px}
+.journey-result-action .ant-btn{height:var(--ds-controlHeightLG);padding-inline:var(--ds-paddingLG);font-size:var(--ds-fontSize);font-weight:var(--ds-fontWeightStrong)}
+.phase-result .journey-result-action{animation:journey-result-copy-in 440ms 520ms cubic-bezier(.22,1,.36,1) both}
 .journey-demo-controls{display:flex;flex-direction:column;align-items:center;gap:var(--ds-marginXS);font-size:var(--ds-fontSizeSM);color:var(--ds-colorTextSecondary)}
 .journey-demo-controls>div{display:flex;gap:var(--ds-marginXS)}
 .journey-waterfall-lines{animation:journey-waterfall 1250ms linear infinite}
@@ -53,5 +71,5 @@
 .journey-foam{animation:journey-foam-bob 2900ms ease-in-out infinite}
 @keyframes journey-waterfall{from{transform:translateY(0)}to{transform:translateY(200px)}}
 @keyframes journey-foam-bob{0%,100%{transform:translate(0,4px)}45%{transform:translate(-3px,-5px)}75%{transform:translate(2px,-1px)}}
-@media(prefers-reduced-motion:reduce){.journey-waterfall-lines,.journey-sick-particles,.journey-foam{animation:none}}
+@media(prefers-reduced-motion:reduce){.journey-waterfall-lines,.journey-sick-particles,.journey-foam{animation:none}.journey-thought,.journey-bubble{transition:none}.phase-result .journey-food-previous{display:none}.phase-result .journey-food-final,.phase-result .journey-result-title,.phase-result .journey-result-details,.phase-result .journey-result-guidance,.phase-result .journey-result-reasons,.phase-result .journey-result-action,.phase-result .journey-status{animation:none}}
 @media(prefers-reduced-motion:reduce){.phase-entering .confirm-photo{animation:none;opacity:0}.journey-mouth-opening.is-chewing,.journey-thought,.journey-food{animation:none}.journey-mouth-opening,.journey-page .confirm-actions{transition:none}}

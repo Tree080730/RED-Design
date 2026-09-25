@@ -1,41 +1,30 @@
-import { CustomNose, CustomTeeth, MouthEars, useMouthConfig } from '../components/MouthConfig';
+import { CustomTeeth, useMouthConfig } from '../components/MouthConfig';
+import { MouthFrame } from '../components/MouthFrame';
+import type { MouthExpansionTarget } from '../components/mouthExpansion';
+
+const compactMouthFrame={x:27.135,y:454.48,width:347.73,height:227.24};
+const journeyMouthTarget:MouthExpansionTarget={
+ viewBox:{x:0,y:0,width:402,height:874},
+ face:{x:-53.6,y:576.6,width:509.2,height:311.9,radius:112.56},
+ cavity:{x:-37.52,y:603.5,width:477.04,height:259.3,radius:107.2},
+ topBand:39.9,bottomBand:39.5,noseY:576,noseScale:53.6/124,
+};
 
 // A single vector face morphs between the two approved compositions.
-export function JourneyMouth({progress,chewing,result,droolOpacity,closure,chewWave,successProgress=0}:{progress:number;chewing:boolean;result:'yes'|'no'|null;droolOpacity:number;closure:number;chewWave:number;successProgress?:number}){
+export function JourneyMouth({progress,chewing,result,droolOpacity,closure,chewWave,successProgress=0}:{progress:number;chewing:boolean;result:'yes'|'no'|'unknown'|null;droolOpacity:number;closure:number;chewWave:number;successProgress?:number}){
  const {config}=useMouthConfig();
- const n=(a:number,b:number)=>a+(b-a)*progress;
- const x=(v:number)=>54.27+v*.53356;
- const y=(v:number)=>498.18+v*.53356;
- const rect=(initial:number[],final:number[])=>({x:n(x(initial[0]),final[0]),y:n(y(initial[1]),final[1]),width:n(initial[2]*.53356,final[2]),height:n(initial[3]*.53356,final[3]),rx:n(initial[4]*.53356,final[4])});
- const cavity=rect([65,42,420,212,106],[-37.52,603.5,477.04,259.3,107.2]);
- const top=n(y(74),643.4),bottom=n(y(222),823.3);
- const tongueStart=[252,222,266,177,319,170,355,195,394,172,442,178,455,222];
- const tongueEnd=[173.1,823.3,181.7,775,251.4,756.2,298,792.7,344.7,756.2,414.3,775,422.9,823.3];
- const t=tongueStart.map((v,i)=>n(i%2?y(v):x(v),tongueEnd[i]));
- const closed=(chewing||result)?closure*(1-successProgress):0;
+ const closed=(chewing||result)?closure*(result==='unknown'?1:1-successProgress):0;
  const pulse=chewWave*closed;
  const mouthY=674-4*pulse;
- return <svg className="journey-face" viewBox="0 0 402 874" preserveAspectRatio="none" role="img" aria-label={result==='yes'?'Satisfied mouth':result==='no'?'Unhappy mouth':chewing?'Mouth chewing':'An eager mouth ready to try food'}>
+ return <div className="journey-face" role="img" aria-label={result==='yes'?'Satisfied mouth':result==='no'?'Unhappy mouth':chewing||result==='unknown'?'Mouth chewing':'An eager mouth ready to try food'}>
+  <MouthFrame className={`journey-shared-mouth journey-mouth-opening ${chewing?'is-chewing':''} ${result?`result-${result}`:''}`} progress={progress} sourceRect={compactMouthFrame} target={journeyMouthTarget} openingOpacity={result?0:1-closed}/>
+  <svg className="journey-effects" viewBox="0 0 402 874" preserveAspectRatio="none" aria-hidden="true">
   <defs>
-   <clipPath id="journey-cavity"><rect {...cavity}/></clipPath>
    <clipPath id="journey-smile-clip"><path d="M92 620H310C345 620 366 646 366 678C366 742 319 786 257 786H145C83 786 36 742 36 678C36 646 57 620 92 620Z"/></clipPath>
    <clipPath id="journey-sick-clip"><path d="M22.5 900V665C22.5 627 49 597 86 597H317C354 597 380.5 627 380.5 665V900Z"/></clipPath>
    <clipPath id="journey-stream-clip"><path d="M22.5 684H380.5V920H22.5Z"/></clipPath>
   </defs>
-  <MouthEars {...rect([40,20,470,260,130],[-53.6,576.6,509.2,311.9,112.56])}/>
-  <g fill="#FDDECB">
-   <rect {...rect([40,20,470,260,130],[-53.6,576.6,509.2,311.9,112.56])}/>
-   <CustomNose x={n(x(252),172.6)} y={n(y(0),554)} width={n(44*.53356,53.6)} height={n(42*.53356,38.6)}/>
-   <ellipse className="journey-cheek" opacity={closed} cx={368+7*pulse} cy={635-14*pulse} rx={54+8*pulse} ry={64+5*pulse}/>
-  </g>
-  <g className={`journey-mouth-opening ${chewing?'is-chewing':''} ${result?`result-${result}`:''}`} opacity={result?0:1-closed} style={{transformOrigin:`201px ${n(y(148),730)}px`,transform:result?undefined:`translateY(${-56*closed}px) scaleY(${1-.96*closed})`}}>
-   <g clipPath="url(#journey-cavity)">
-    <rect {...cavity} fill="#FFFFFF"/>
-    <path fill={config.insideColor} d={`M${cavity.x} ${top}H${cavity.x+cavity.width}V${bottom}H${cavity.x}Z`}/>
-    <CustomTeeth x={cavity.x} y={top} width={cavity.width} height={18}/>
-    <path fill={config.tongueColor} d={`M${t[0]} ${t[1]}C${t.slice(2,8).join(' ')}C${t.slice(8).join(' ')}Z`}/>
-   </g>
-  </g>
+  <ellipse className="journey-cheek" opacity={closed} cx={368+7*pulse} cy={635-14*pulse} rx={54+8*pulse} ry={64+5*pulse} fill="#FDDECB"/>
   {result==='yes'&&<g className="journey-happy-mouth" opacity={successProgress} transform={`translate(0 ${674*(1-(.06+.94*successProgress))}) scale(1 ${.06+.94*successProgress})`}>
    {/* Match the mouth bounds in the 750×1624 page reference. */}
    <g className="journey-smile-size" transform="translate(200 692) scale(1.147 1.151) translate(-201 -703)">
@@ -85,11 +74,12 @@ export function JourneyMouth({progress,chewing,result,droolOpacity,closure,chewW
    <path strokeWidth="12" d={`M60 ${mouthY} C97 ${650+5*pulse} 120 ${648-3*pulse} 153 ${661+4*pulse} S199 ${678-5*pulse} 230 ${664-3*pulse} S284 ${647+5*pulse} 326 ${mouthY}`}/>
    <path strokeWidth="12" d={`M337 ${644-5*pulse} Q${322-3*pulse} ${mouthY} 337 ${703-3*pulse}`}/>
   </g>
-  <g opacity={droolOpacity} transform="translate(54.27 498.18) scale(.53356)">
-   <g fill="#79BFFF" transform="translate(446 222)">
+  <g opacity={droolOpacity} transform="translate(54.27 508.18) scale(.53356)">
+   <g fill="#79BFFF" transform="translate(463 222)">
     <path className="confirm-drool-strand" d="M-9 0H9V91H-9Z"/>
     <g className="confirm-drool-drop"><circle className="confirm-drool-bead" r="21"/></g>
    </g>
   </g>
- </svg>;
+  </svg>
+ </div>;
 }

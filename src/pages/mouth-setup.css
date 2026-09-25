@@ -1,9 +1,10 @@
 .mouth-setup{display:flex;flex-direction:column;flex:1;align-self:stretch;width:100%;max-width:none;min-height:0;margin:0;padding:0;overflow:hidden}
 .mouth-setup-header{position:relative;display:flex;align-items:center;justify-content:center;flex:none;height:66px;background:var(--ds-colorBgContainer)}
 .mouth-setup-header h1{margin:0;color:var(--ds-colorPrimary);font-size:var(--ds-fontSizeHeading3);line-height:var(--ds-lineHeightHeading3);font-weight:var(--ds-fontWeightStrong);white-space:nowrap}
-.mouth-setup-header .mouth-close{position:absolute;left:0;top:50%;transform:translateY(-50%);width:44px;height:44px;color:var(--ds-colorTextTertiary);font-size:var(--ds-fontSizeLG)}
-.mouth-preview{display:grid;place-items:center;flex:0 0 41.6%;min-height:0;background:#EAF3FF;overflow:hidden}
+.mouth-setup-header .mouth-close{position:absolute;left:0;top:50%;transform:translateY(-50%);width:44px;height:44px;--ant-btn-text-color:var(--ds-colorTextTertiary);font-size:var(--ds-fontSizeLG)}
+.mouth-preview{display:grid;place-items:center;flex:0 0 41.6%;min-height:0;margin-top:10px;background:#EAF3FF;overflow:hidden}
 .mouth-preview>.mouth-portrait{display:block;width:92%;height:100%;max-height:none}
+.mouth-setup-arriving .mouth-preview{overflow:visible;position:relative;z-index:1}
 .mouth-tabs{display:flex;flex:none;aspect-ratio:1534/254;width:100%;padding-top:var(--ds-paddingXS);border-bottom:2px solid #D9D9D9;background:var(--ds-colorBgContainer)}
 .mouth-tabs button{position:relative;display:grid;place-items:center;flex:1;min-width:0;padding:0;border:0;background:transparent;color:#B2B3B0;cursor:pointer}
 .mouth-tabs svg{width:100%;height:100%;display:block}.mouth-tabs button[aria-selected=true]{color:var(--ds-colorPrimary)}

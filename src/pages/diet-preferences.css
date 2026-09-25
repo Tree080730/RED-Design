@@ -21,11 +21,11 @@
 .diet-remove{padding:0 var(--ds-paddingXS);border:0;background:transparent;color:inherit;border-radius:var(--ds-borderRadiusLG);cursor:pointer}
 .diet-bottom{margin-top:var(--ds-marginLG);padding:0}
 .diet-continue.ant-btn{width:100%}
-.diet-continue.ant-btn:hover{border-color:transparent!important;background:var(--ds-colorPrimary)!important;color:var(--ds-colorTextLightSolid)!important}
 .diet-confirm-title{font-size:var(--ds-fontSizeHeading3);line-height:var(--ds-lineHeightHeading3);font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorText);margin:0 0 var(--ds-marginLG)}
 .diet-chip-wrap.is-static,.diet-chip-wrap.is-static .diet-chip{cursor:default}
 .diet-none,.diet-empty{color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSize);line-height:var(--ds-lineHeight);margin:0}
-.diet-review-note{font-size:var(--ds-fontSizeSM);color:var(--ds-colorTextSecondary);margin-top:var(--ds-margin)}
+.diet-review-note{font-size:var(--ds-fontSizeSM);color:var(--ds-colorTextTertiary);margin:0 0 calc(var(--ds-marginLG) - (var(--ds-lineHeight) - 1) / 2 * var(--ds-fontSizeSM))}
+.diet-confirm-title:has(+ .diet-review-note){margin-bottom:var(--ds-marginXS)}
 .diet-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* iPhone 17 Pro portrait design canvas; device geometry is not a global token. */
 .diet-page{max-width:402px;padding-top:env(safe-area-inset-top)}
@@ -67,8 +67,7 @@
 .diet-mouth-viewport{padding:0;gap:var(--ds-margin)}
 .diet-header{position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;min-height:44px;padding:0 calc(var(--ds-paddingXL) + var(--ds-padding))}
 .diet-header h1{margin:0;font-size:var(--ds-fontSizeHeading3);line-height:var(--ds-lineHeightHeading3);font-weight:var(--ds-fontWeightStrong);color:var(--ds-colorPrimary);white-space:nowrap}
-.diet-back.ant-btn{position:absolute;left:0;top:0;width:44px;height:44px;color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
-.diet-back.ant-btn:hover{background:transparent!important;color:var(--ds-colorTextSecondary)!important}
+.diet-back.ant-btn{position:absolute;left:0;top:0;width:44px;height:44px;--ant-btn-text-color:var(--ds-colorTextSecondary);font-size:var(--ds-fontSizeLG)}
 .diet-mouth-scene{position:relative;isolation:isolate;flex:1 0 auto;max-width:none;margin:0;padding:calc(var(--ds-paddingXL) + var(--ds-controlHeightLG) + var(--ds-padding)) calc(var(--ds-paddingXL) + var(--ds-padding)) calc(var(--ds-paddingXL) + var(--ds-paddingLG) + var(--ds-paddingLG));display:flex;align-items:center;min-width:0}
 .mouth-frame-art{position:absolute;inset:0;z-index:-1;pointer-events:none;background:#FDDECB;border-radius:64px}
 .mouth-frame-art::before{content:"";position:absolute;width:32px;height:24px;top:-12px;left:calc(50% - 16px);border-radius:16px;background:#FDDECB}
@@ -88,12 +87,13 @@
 .diet-mouth-action{flex-shrink:0;margin:0;padding:0 calc(var(--ds-paddingXL) + var(--ds-paddingXS))}
 
 /* A continuous configured character carries setup into the preferences frame. */
-.mouth-setup-layer{position:absolute;inset:max(44px,env(safe-area-inset-top)) 0 max(44px,env(safe-area-inset-bottom));display:flex;z-index:2;background:var(--ds-colorBgContainer)}
+.mouth-setup-layer{position:absolute;inset:max(44px,env(safe-area-inset-top)) 0 max(44px,env(safe-area-inset-bottom));display:flex;z-index:5;background:var(--ds-colorBgContainer)}
 .mouth-setup-layer .mouth-setup{height:100%}
-.setup-transition-layer{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+.setup-transition-layer{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
 .diet-entering .mouth-frame-art{visibility:hidden}
-.diet-entering .diet-header,.diet-entering .diet-mouth-content,.diet-entering .diet-mouth-action{position:relative;z-index:4}
-.diet-entering .diet-mouth-scene{z-index:4}
+/* Revealed controls must paint above the animated portrait (z-index: 6). */
+.diet-entering .diet-header,.diet-entering .diet-mouth-content,.diet-entering .diet-mouth-action{position:relative;z-index:7}
+.diet-entering .diet-mouth-scene{z-index:7}
 .mouth-frame-configured{background:none;border-radius:0}
 .mouth-frame-configured::before{display:none}
 .mouth-frame-output{position:absolute;inset:0;overflow:visible}
