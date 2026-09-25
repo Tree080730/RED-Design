@@ -15,7 +15,7 @@ Button、Tabs、Checkbox、Radio、Input、Switch、Modal 直接使用 antd 6.0.
 | CharacterLab（AvatarBuilder.tsx） | 编辑草稿／已保存配置与结果选择 → 头像预览和动画样例 | 保存应用；取消回退；状态与外观分离，离开取消计时 |
 | TokenProvider | theme.useToken → CSS 变量 | 单一运行时来源，不复制刻度 |
 | FoodCheckDetails | 三类已选条件 + Demo 依据 → 结果原因、依据来源与未知项 | 过敏、饮食限制、偏好按优先级展示；未知信息不转为匹配或冲突；固定显示 Demo 标识 |
-| WaiterCheck | 未知食物照片 + 可编辑的结构化问题 → 用户英文预览与店员多语言沟通卡 | 不显示推断菜名或结果标签；照片与译文同卡；标题右侧进入语言选择页；底部确认由店员操作 |
+| WaiterCheck | 未知食物照片 + 可编辑的结构化问题 → 用户英文预览与店员多语言沟通卡 | 不显示推断菜名或结果标签；照片与译文同卡；标题右侧进入语言选择页；底部 `Done` 返回拍照页 |
 
 人物 v0.2 字段：skin、hair（wave / crop / bob / curly / ponytail / bald）、hairColor、shirt、glasses、glassesShape、face、body、outfit、background。Mood：idle、eating、match、conflict、unknown。详见 [人物规范](./avatar.md)。
 

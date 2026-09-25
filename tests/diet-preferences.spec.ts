@@ -8,6 +8,12 @@ test('mouth setup uses the light layout and saves before dietary preferences',as
  await page.getByRole('tab',{name:'Mouth',exact:true}).click();await page.getByRole('tab',{name:'Nose',exact:true}).click();
  await expect(page.getByRole('button',{name:'Bridge nose',exact:true})).toHaveAttribute('aria-pressed','true');await expect(page.getByRole('button',{name:'Heart nostrils',exact:true})).toHaveAttribute('aria-pressed','true');
  for(const tab of ['Nose','Mouth','Teeth','Tongue','Hair']){await page.getByRole('tab',{name:tab,exact:true}).click();await expect(page.getByRole('tab',{name:tab,exact:true})).toHaveAttribute('aria-selected','true');}
+ await page.getByRole('tab',{name:'Tongue',exact:true}).click();
+ expect(await page.locator('.mouth-option .mouth-portrait').evaluateAll(previews=>previews.filter(preview=>preview.querySelector('[data-mouth-layer="tongue"]')).every(preview=>{const tongue=preview.querySelector('[data-mouth-layer="tongue"]')!;return [...preview.querySelectorAll('[data-mouth-layer="teeth"]')].every(teeth=>Boolean(tongue.compareDocumentPosition(teeth)&Node.DOCUMENT_POSITION_FOLLOWING));}))).toBe(true);
+ await page.getByRole('tab',{name:'Teeth',exact:true}).click();
+ expect(await page.locator('.mouth-option .mouth-portrait').evaluateAll(previews=>previews.filter(preview=>preview.querySelector('[data-mouth-layer="tongue"]')).every(preview=>{const tongue=preview.querySelector('[data-mouth-layer="tongue"]')!;return [...preview.querySelectorAll('[data-mouth-layer="teeth"]')].every(teeth=>Boolean(tongue.compareDocumentPosition(teeth)&Node.DOCUMENT_POSITION_FOLLOWING));}))).toBe(true);
+ expect(await page.locator('.mouth-preview .mouth-portrait').evaluate(preview=>{const tongue=preview.querySelector('[data-mouth-layer="tongue"]')!;return [...preview.querySelectorAll('[data-mouth-layer="teeth"]')].every(teeth=>Boolean(tongue.compareDocumentPosition(teeth)&Node.DOCUMENT_POSITION_FOLLOWING));})).toBe(true);
+ await page.getByRole('tab',{name:'Hair',exact:true}).click();
  await page.getByRole('button',{name:'Spiky hair',exact:true}).click();
  await page.getByRole('tab',{name:'Teeth',exact:true}).click();await page.getByRole('button',{name:'Star sticker',exact:true}).click();
  await page.getByRole('tab',{name:'Hair',exact:true}).click();await expect(page.getByRole('button',{name:'Spiky hair',exact:true})).toHaveAttribute('aria-pressed','true');
@@ -43,14 +49,20 @@ test('confirm opens camera page with shutter',async({page})=>{
  await page.setViewportSize({width:402,height:874});await openDiet(page);await page.getByRole('button',{name:'Continue',exact:true}).click();await page.getByRole('button',{name:'Confirm',exact:true}).click();
  await expect(page.getByRole('heading',{name:'What’s on the table?'})).toBeVisible();await expect(page.getByLabel('Camera preview')).toBeVisible();
  await expect(page.locator('.camera-food-preview')).toHaveAttribute('src','/kung-pao-chicken-demo.png');
+ const fixedCameraGeometry=await page.evaluate(()=>{const read=(selector:string)=>{const rect=document.querySelector(selector)!.getBoundingClientRect();return {x:rect.x,y:rect.y,width:rect.width,height:rect.height};};return {viewfinder:read('.camera-viewfinder'),captureArea:read('.camera-capture-area')};});
+ const expectFixedCameraGeometry=async()=>expect(await page.evaluate(()=>{const read=(selector:string)=>{const rect=document.querySelector(selector)!.getBoundingClientRect();return {x:rect.x,y:rect.y,width:rect.width,height:rect.height};};return {viewfinder:read('.camera-viewfinder'),captureArea:read('.camera-capture-area')};})).toEqual(fixedCameraGeometry);
  const zoomTwo=page.getByRole('button',{name:'2× zoom'});await zoomTwo.click();await expect(zoomTwo).toHaveText('2x');await expect(zoomTwo).toHaveAttribute('aria-pressed','true');
  const expectSelectedZoomCentered=async()=>expect.poll(async()=>page.evaluate(()=>{const preview=document.querySelector('.camera-viewfinder')!.getBoundingClientRect();const indicator=document.querySelector('.camera-zoom-indicator')!.getBoundingClientRect();const selected=document.querySelector('.camera-zoom button[aria-pressed=true]')!.getBoundingClientRect();return Math.max(Math.abs(indicator.left+indicator.width/2-selected.left-selected.width/2),Math.abs(preview.left+preview.width/2-selected.left-selected.width/2));})).toBeLessThan(1);
- await expectSelectedZoomCentered();
- for(const level of ['0.5','1','5']){await page.getByRole('button',{name:`${level}× zoom`,exact:true}).click();await expectSelectedZoomCentered();}
+ await expectSelectedZoomCentered();await expectFixedCameraGeometry();
+ for(const level of ['0.5','1','5']){await page.getByRole('button',{name:`${level}× zoom`,exact:true}).click();await expectSelectedZoomCentered();await expectFixedCameraGeometry();}
+ await expect(page.locator('.camera-preview-media')).toHaveCSS('overflow','hidden');
  const flash=page.locator('.camera-flash');await expect(flash).toHaveAttribute('aria-pressed','false');await flash.click();await expect(flash).toHaveAttribute('aria-pressed','true');await flash.click();await expect(flash).toHaveAttribute('aria-pressed','false');
- const controlAlignment=await page.evaluate(()=>{const pageBox=document.querySelector('.camera-page')!.getBoundingClientRect();const controls=[...document.querySelectorAll('.camera-tool')] as HTMLElement[];const shutter=document.querySelector('.camera-shutter')!.getBoundingClientRect();return {left:controls[0].getBoundingClientRect().left-pageBox.left,right:pageBox.right-controls[1].getBoundingClientRect().right,center:Math.abs(shutter.left+shutter.width/2-(pageBox.left+pageBox.width/2))};});expect(controlAlignment.left).toBeCloseTo(32,0);expect(controlAlignment.right).toBeCloseTo(32,0);expect(controlAlignment.center).toBeLessThan(1);
+ const controlAlignment=await page.evaluate(()=>{const pageBox=document.querySelector('.camera-page')!.getBoundingClientRect();const area=document.querySelector('.camera-capture-area')!.getBoundingClientRect();const controls=[...document.querySelectorAll('.camera-tool')] as HTMLElement[];const shutter=document.querySelector('.camera-shutter')!.getBoundingClientRect();return {left:controls[0].getBoundingClientRect().left-pageBox.left,right:pageBox.right-controls[1].getBoundingClientRect().right,horizontalCenter:Math.abs(shutter.left+shutter.width/2-(pageBox.left+pageBox.width/2)),verticalCenter:Math.abs(shutter.top+shutter.height/2-(area.top+area.height/2))};});expect(controlAlignment.left).toBeCloseTo(32,0);expect(controlAlignment.right).toBeCloseTo(32,0);expect(controlAlignment.horizontalCenter).toBeLessThan(1);expect(controlAlignment.verticalCenter).toBeLessThan(1);
  await page.getByRole('button',{name:'Capture photo'}).click();await expect(page.getByRole('heading',{name:'Look good?'})).toBeVisible();
+ await expect(page.locator('.confirm-page')).toHaveAttribute('data-arriving','false');
+ const photoGuidance=page.getByText('Make sure the photo is clear.',{exact:true});await expect(photoGuidance).toBeVisible();await expect(photoGuidance).toHaveCSS('font-size','16px');
  await expect(page.getByRole('img',{name:'Captured Kung Pao Chicken photo'})).toHaveCSS('background-image',/kung-pao-chicken-demo\.png/);
+ const guidanceSpacing=await page.evaluate(()=>{const title=document.querySelector('#photo-confirm-title')!.getBoundingClientRect();const guidance=document.querySelector('.confirm-review-guidance')!.getBoundingClientRect();const photo=document.querySelector('.confirm-photo')!.getBoundingClientRect();return Math.abs((guidance.top-title.bottom)-(photo.top-guidance.bottom));});expect(guidanceSpacing).toBeLessThanOrEqual(4);
  expect(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight&&document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.getByRole('button',{name:'Again',exact:true}).click();await expect(page.getByLabel('Camera preview')).toBeVisible();
  await page.getByRole('button',{name:'Back to preferences'}).click();await expect(page.getByRole('heading',{name:'What do you avoid?'})).toBeVisible();
@@ -138,6 +150,20 @@ test('configured mouth opens continuously into preferences and respects reduced 
  await expect(page.locator('.journey-shared-mouth .mouth-frame-output [fill="#FFDB13"]')).toHaveCount(1);
 });
 
+test('camera mouth editing continues into dietary preferences without overlaying the camera',async({page})=>{
+ await page.setViewportSize({width:402,height:874});await openDiet(page);
+ await page.getByRole('button',{name:'Peanut',exact:true}).click();
+ await page.getByRole('button',{name:'Continue',exact:true}).click();await page.getByRole('button',{name:'Confirm',exact:true}).click();
+ await page.locator('.camera-page').getByRole('button',{name:'Edit your mouth',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Create your MOUTH'})).toBeVisible();
+ await page.getByRole('button',{name:'Save mouth and continue'}).click();
+ await expect(page.locator('.setup-transition-layer > svg')).toHaveCount(1);
+ await expect(page.locator('.camera-page')).toHaveCount(0);
+ await expect(page.locator('.setup-transition-layer')).toHaveCount(0);
+ await expect(page.getByRole('heading',{name:'What do you avoid?'})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Peanut',exact:true})).toHaveAttribute('aria-pressed','true');
+});
+
 test('capture carries the viewfinder into the photo before revealing review controls',async({page})=>{
  await page.setViewportSize({width:402,height:874});await openDiet(page);
  await page.getByRole('button',{name:'Continue',exact:true}).click();await page.getByRole('button',{name:'Confirm',exact:true}).click();
@@ -152,7 +178,22 @@ test('capture carries the viewfinder into the photo before revealing review cont
  expect(start.actions).toBe('0');
  await page.locator('.confirm-page').evaluate(root=>root.getAnimations({subtree:true}).forEach(a=>a.play()));
  await expect(page.locator('.confirm-page')).toHaveAttribute('data-arriving','false');
- await page.getByRole('button',{name:'Again',exact:true}).click();await page.emulateMedia({reducedMotion:'reduce'});
+ await page.getByRole('button',{name:'Again',exact:true}).click();
+ await expect(page.locator('.confirm-page')).toHaveAttribute('data-departing','true');
+ const reverseEnd=await page.locator('.confirm-page').evaluate(root=>{
+  const photo=root.querySelector<HTMLElement>('.confirm-photo')!;const elements=[...root.querySelectorAll<HTMLElement>('.confirm-header,.confirm-review-guidance,.journey-character,.confirm-actions')];
+  [photo,...elements].forEach(element=>element.getAnimations().forEach(animation=>{animation.pause();animation.currentTime=899;}));
+  const r=photo.getBoundingClientRect();const opacity=elements.map(element=>getComputedStyle(element).opacity);
+  return {x:r.x,y:r.y,width:r.width,height:r.height,opacity};
+ });
+ for(const k of ['x','y','width','height'] as const)expect(reverseEnd[k]).toBeCloseTo(source![k],0);
+ expect(reverseEnd.opacity.every(value=>value==='0')).toBe(true);
+ await page.locator('.confirm-page').evaluate(root=>root.getAnimations({subtree:true}).forEach(a=>a.play()));
+ const camera=page.locator('.camera-page');await expect(camera).toHaveAttribute('data-revealing','true');
+ const revealDelays=await camera.evaluate(root=>['.camera-header','.camera-zoom','.camera-capture-area'].map(selector=>(root.querySelector(selector)!.getAnimations()[0].effect!.getTiming().delay)));
+ expect(revealDelays).toEqual([80,180,280]);
+ await expect(camera).toHaveAttribute('data-revealing','false');
+ await page.emulateMedia({reducedMotion:'reduce'});
  await page.getByRole('button',{name:'Capture photo'}).click();
  await expect(page.locator('.confirm-page')).toHaveAttribute('data-arriving','false');
  await expect(page.getByRole('button',{name:'Check food',exact:true})).toBeEnabled();
@@ -220,9 +261,14 @@ test('unknown result keeps chewing and opens the waiter confirmation page',async
  await expect(page.getByText('私はピーナッツアレルギーがあります。',{exact:true})).toBeVisible();
  await expect(page.getByText('この料理にピーナッツが含まれておらず、調理中にもピーナッツに触れないことを確認してください。',{exact:true})).toBeVisible();
  await expect(page.getByText('I have a peanut allergy. Please confirm that this dish contains no peanuts',{exact:false})).toBeVisible();
- await page.getByRole('button',{name:'読みました',exact:true}).click();
- await expect(page.getByRole('button',{name:'確認済み',exact:true})).toBeVisible();
- await page.getByRole('button',{name:'Back to unknown result'}).click();
- await expect(page.getByText('Not sure yet',{exact:true})).toBeVisible();
- await expect(page.locator('.journey-mouth-opening')).toHaveClass(/is-chewing/);
+ await page.setViewportSize({width:402,height:700});
+ const waiterScroller=page.locator('.waiter-check-content');
+ await expect(waiterScroller).toHaveCSS('overflow-y','auto');
+ expect(await waiterScroller.evaluate(element=>element.scrollHeight>element.clientHeight)).toBe(true);
+ await waiterScroller.evaluate(element=>element.scrollTo({top:element.scrollHeight}));
+ expect(await waiterScroller.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
+ await expect(page.getByRole('button',{name:'Done',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Done',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'What’s on the table?'})).toBeVisible();
+ await expect(page.getByLabel('Camera preview')).toBeVisible();
 });

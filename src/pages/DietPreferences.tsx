@@ -16,17 +16,23 @@ export default function DietPreferences(){
  const [notice,noticeContext]=message.useMessage();
  const [setup,setSetup]=useState(true);
  const [captureBounds,setCaptureBounds]=useState<DOMRect|null>(null);
+ const [cameraReturning,setCameraReturning]=useState(false);
+ const [view,setView]=useState<'select'|'confirm'|'camera'|'photo-confirm'>('select');
  const [entering,setEntering]=useState(false);
  const [setupEntering,setSetupEntering]=useState(false);
  const finishSetupEntry=useCallback(()=>setSetupEntering(false),[]);
  const reenterSetup=useCallback(()=>{setSetupEntering(!matchMedia('(prefers-reduced-motion: reduce)').matches);setSetup(true);},[]);
  const finishEntry=useCallback(()=>{setEntering(false);setSetup(false);},[]);
- const continueSetup=()=>{if(entering)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){setSetup(false);return;}setEntering(true);};
+ const continueSetup=()=>{
+  if(entering)return;
+  setView('select');
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){setSetup(false);return;}
+  setEntering(true);
+ };
  const [selected,setSelected]=useState<Choices>(()=>personalizedDemo?{allergies:['Peanut'],diet:[],preferences:['Mild spice']}:emptyDietChoices());
  const [custom,setCustom]=useState<Choices>(emptyDietChoices);
  const [editing,setEditing]=useState<GroupKey|null>(null);
  const [value,setValue]=useState('');const [error,setError]=useState('');
- const [view,setView]=useState<'select'|'confirm'|'camera'|'photo-confirm'>('select');
  const [simulate]=useState(()=>navigator.maxTouchPoints===0);
  const inputRef=useRef<InputRef>(null);
  const formRef=useRef<HTMLFormElement>(null);
@@ -115,8 +121,14 @@ export default function DietPreferences(){
   <div className="diet-bottom"><Button type="primary" size="large" className="diet-continue" onClick={()=>goTo('camera')}>Confirm</Button></div>
    </main>
   </div>}
- {view==='camera'&&<CameraCapture onBack={()=>goTo('select')} onCapture={bounds=>{setCaptureBounds(bounds);goTo('photo-confirm');}} onEditMouth={reenterSetup}/>}
- {view==='photo-confirm'&&<PhotoConfirm choices={selected} captureBounds={captureBounds} onBack={()=>goTo('camera')} onRetake={()=>goTo('camera')}/>}
+ {view==='camera'&&<CameraCapture
+  revealing={cameraReturning}
+  onRevealComplete={()=>setCameraReturning(false)}
+  onBack={()=>{setCameraReturning(false);goTo('select');}}
+  onCapture={bounds=>{setCameraReturning(false);setCaptureBounds(bounds);goTo('photo-confirm');}}
+  onEditMouth={reenterSetup}
+ />}
+ {view==='photo-confirm'&&<PhotoConfirm choices={selected} captureBounds={captureBounds} onBack={()=>{setCameraReturning(false);goTo('camera');}} onRetake={()=>{setCameraReturning(true);goTo('camera');}}/>}
  {view==='select'&&editing&&simulate&&<SimulatedKeyboard onKey={typeKey} onDone={add} onDismiss={()=>{if(value.trim())add();else cancel();}} onReveal={revealInput}/>}
  </div>;
 }

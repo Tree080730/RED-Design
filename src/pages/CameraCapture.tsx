@@ -4,14 +4,17 @@ import { LeftOutlined, SmileOutlined, SyncOutlined, ThunderboltOutlined } from '
 import './camera-capture.css';
 import { demoFood } from './demoFood';
 
-type CameraCaptureProps={onBack:()=>void;onCapture:(bounds:DOMRect)=>void;onEditMouth:()=>void};
+type CameraCaptureProps={onBack:()=>void;onCapture:(bounds:DOMRect)=>void;onEditMouth:()=>void;revealing?:boolean;onRevealComplete?:()=>void};
 const zoomLevels=['0.5','1','2','5'] as const;
 type ZoomLevel=typeof zoomLevels[number];
+const zoomScale:Record<ZoomLevel,number>={'0.5':.9,'1':1,'2':1.28,'5':1.62};
 
-export default function CameraCapture({onBack,onCapture,onEditMouth}:CameraCaptureProps){
+export default function CameraCapture({onBack,onCapture,onEditMouth,revealing=false,onRevealComplete}:CameraCaptureProps){
  const [zoom,setZoom]=useState<ZoomLevel>('1');
  const [flash,setFlash]=useState(false);
  const [inverted,setInverted]=useState(false);
+ const [revealingControls,setRevealingControls]=useState(()=>revealing&&!matchMedia('(prefers-reduced-motion: reduce)').matches);
+ const pageRef=useRef<HTMLElement>(null);
  const zoomRef=useRef<HTMLDivElement>(null);
  const zoomTrackRef=useRef<HTMLDivElement>(null);
  const zoomButtons=useRef<(HTMLButtonElement|null)[]>([]);
@@ -43,18 +46,37 @@ export default function CameraCapture({onBack,onCapture,onEditMouth}:CameraCaptu
   ],{duration:440,easing:'cubic-bezier(.4,0,.2,1)'});
   previousOffset.current=targetX;
  },[zoom]);
+ useLayoutEffect(()=>{
+  if(!revealing){setRevealingControls(false);return;}
+  const root=pageRef.current!;
+  const media=matchMedia('(prefers-reduced-motion: reduce)');
+  if(media.matches){setRevealingControls(false);onRevealComplete?.();return;}
+  setRevealingControls(true);
+  const targets=[root.querySelector<HTMLElement>('.camera-header')!,root.querySelector<HTMLElement>('.camera-zoom')!,root.querySelector<HTMLElement>('.camera-capture-area')!];
+  const animations=targets.map((element,index)=>element.animate([
+   {opacity:0,transform:`translateY(${index===0?-10:12}px)`},
+   {opacity:1,transform:'translateY(0)'},
+  ],{duration:360,delay:80+index*100,fill:'both',easing:'cubic-bezier(.22,1,.36,1)'}));
+  const finish=()=>{setRevealingControls(false);onRevealComplete?.();};
+  animations.at(-1)!.finished.then(finish).catch(()=>{});
+  const motionChange=()=>{if(media.matches){animations.forEach(animation=>animation.cancel());finish();}};
+  media.addEventListener('change',motionChange);
+  return ()=>{animations.forEach(animation=>animation.cancel());media.removeEventListener('change',motionChange);};
+ },[revealing,onRevealComplete]);
  const capture=(event:React.MouseEvent<HTMLButtonElement>)=>{
   const preview=event.currentTarget.closest('.camera-page')!.querySelector('.camera-viewfinder')!;
   onCapture(preview.getBoundingClientRect());
  };
- return <main className="camera-page" aria-labelledby="camera-title">
+ return <main className="camera-page" aria-labelledby="camera-title" ref={pageRef} inert={revealingControls?true:undefined} data-revealing={revealingControls}>
   <header className="camera-header app-page-header">
    <Button type="text" className="camera-back" aria-label="Back to preferences" icon={<LeftOutlined/>} onClick={onBack}/>
    <h1 id="camera-title">What’s on the table?</h1>
    <Button type="text" className="camera-edit-mouth" aria-label="Edit your mouth" icon={<SmileOutlined/>} onClick={onEditMouth}/>
   </header>
   <section className="camera-viewfinder" aria-label="Camera preview">
-   <img className={`camera-food-preview ${flash?'is-lit':''}`} src={demoFood.imageSrc} alt="" aria-hidden="true" style={{transform:`scale(${zoom==='0.5'?.9:zoom==='1'?1:zoom==='2'?1.28:1.62})`}}/>
+   <div className="camera-preview-media" aria-hidden="true">
+    <img className={`camera-food-preview ${flash?'is-lit':''}`} src={demoFood.imageSrc} alt="" style={{transform:`scale(${zoomScale[zoom]})`}}/>
+   </div>
    <div className="camera-zoom" aria-label="Camera zoom" ref={zoomRef}>
     <span className="camera-zoom-indicator" ref={indicatorRef} aria-hidden="true"/>
     <div className="camera-zoom-track" ref={zoomTrackRef}>

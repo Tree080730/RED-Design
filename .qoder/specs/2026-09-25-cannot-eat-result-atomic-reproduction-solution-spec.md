@@ -79,6 +79,7 @@
 | 4 | 在详情入口下展示命中的已选标签原因，仅包含 Demo 规则确认的冲突或不匹配项 | B | 内容、状态 | `dietChoices.ts`、`PhotoConfirm.tsx`、`photo-confirm.css`、测试 | 无 | 否 | 已实现 |
 | 5 | 将拍照确认、checking 与结果态基础嘴统一为配置页的 `FinalMouthPortrait` / `MouthFrame`，动作层仅叠加闭嘴、口水和结果流体 | B | 共享组件、动效 | `MouthFrame.tsx`、`mouthExpansion.ts`、`JourneyMouth.tsx`、`photo-confirm.css`、测试 | 几何与转场连续性 | 否 | 已实现 |
 | 6 | 依据共享嘴的下齿白带重新校准口水锚点，向右下移动且保留原弹性动画 | B | 动效、几何 | `JourneyMouth.tsx`、视觉回归 | 口水与下唇连接位置 | 否 | 已实现 |
+| 7 | 在 `Look good?` 标题下增加照片清晰度提示，不改变照片、嘴和操作区几何 | B | 内容 | `PhotoConfirm.tsx`、`photo-confirm.css`、测试 | 文案与照片间距 | 否 | 已实现 |
 
 ## 用户确认
 

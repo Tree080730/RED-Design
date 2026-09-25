@@ -4,7 +4,7 @@ import { CheckOutlined, EditOutlined, GlobalOutlined, LeftOutlined } from '@ant-
 import { demoFood } from './demoFood';
 import './waiter-check.css';
 
-type WaiterCheckProps={onBack:()=>void};
+type WaiterCheckProps={onBack:()=>void;onDone:()=>void};
 type WaiterLanguage='zh-CN'|'ja-JP';
 
 const languageOptions:[WaiterLanguage,string,string][]=[
@@ -12,11 +12,10 @@ const languageOptions:[WaiterLanguage,string,string][]=[
  ['ja-JP','日本語','Japanese'],
 ];
 
-export default function WaiterCheck({onBack}:WaiterCheckProps){
+export default function WaiterCheck({onBack,onDone}:WaiterCheckProps){
  const [askPeanut,setAskPeanut]=useState(true);
  const [askSpice,setAskSpice]=useState(true);
  const [editing,setEditing]=useState(false);
- const [acknowledged,setAcknowledged]=useState(false);
  const [language,setLanguage]=useState<WaiterLanguage>('zh-CN');
  const [showLanguages,setShowLanguages]=useState(false);
  const englishMessage=askPeanut&&askSpice
@@ -31,11 +30,11 @@ export default function WaiterCheck({onBack}:WaiterCheckProps){
  const japaneseLead=askPeanut&&askSpice?'私はピーナッツアレルギーがあり、辛さは控えめしか食べられません。':askPeanut?'私はピーナッツアレルギーがあります。':askSpice?'辛さは控えめしか食べられません。':'この料理について確認が必要です。';
  const japaneseQuestion=askPeanut&&askSpice?'この料理にアレルギーの原因となる食品（ピーナッツ）が含まれておらず、調理中にもピーナッツに触れず、辛さ控えめにできることを確認してください。':askPeanut?'この料理にピーナッツが含まれておらず、調理中にもピーナッツに触れないことを確認してください。':askSpice?'この料理を辛さ控えめにできることを確認してください。':'この料理の材料と調理方法を教えてください。';
  const waiterCopy=language==='zh-CN'
-  ?{lead:chineseLead,question:chineseQuestion,fallback:'如果无法确认，请告诉我。',action:'我已阅读',done:'已阅读'}
-  :{lead:japaneseLead,question:japaneseQuestion,fallback:'確認できない場合は、そう伝えてください。',action:'読みました',done:'確認済み'};
+  ?{lead:chineseLead,question:chineseQuestion,fallback:'如果无法确认，请告诉我。'}
+  :{lead:japaneseLead,question:japaneseQuestion,fallback:'確認できない場合は、そう伝えてください。'};
  const languageLabel=language==='zh-CN'?'中文':'日本語';
- const updateConcern=(kind:'peanut'|'spice',checked:boolean)=>{setAcknowledged(false);if(kind==='peanut')setAskPeanut(checked);else setAskSpice(checked);};
- const selectLanguage=(nextLanguage:WaiterLanguage)=>{setLanguage(nextLanguage);setAcknowledged(false);setShowLanguages(false);};
+ const updateConcern=(kind:'peanut'|'spice',checked:boolean)=>{if(kind==='peanut')setAskPeanut(checked);else setAskSpice(checked);};
+ const selectLanguage=(nextLanguage:WaiterLanguage)=>{setLanguage(nextLanguage);setShowLanguages(false);};
  return <main className="waiter-check-page" aria-labelledby="waiter-check-title">
   <header className="waiter-check-header app-page-header" inert={showLanguages?true:undefined}>
    <Button type="text" className="waiter-check-back" aria-label="Back to unknown result" icon={<LeftOutlined/>} onClick={onBack}/>
@@ -65,7 +64,7 @@ export default function WaiterCheck({onBack}:WaiterCheckProps){
    </section>
   </div>
   <div className="waiter-check-actions" inert={showLanguages?true:undefined}>
-   <Button type="primary" size="large" block aria-label={acknowledged?waiterCopy.done:waiterCopy.action} icon={acknowledged?<CheckOutlined/>:undefined} onClick={()=>setAcknowledged(true)}>{acknowledged?waiterCopy.done:waiterCopy.action}</Button>
+   <Button type="primary" size="large" block onClick={onDone}>Done</Button>
   </div>
   {showLanguages&&<section className="waiter-language-page" aria-labelledby="waiter-language-title">
    <header className="waiter-language-header app-page-header">

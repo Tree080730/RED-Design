@@ -14,7 +14,8 @@
 
 - The unknown result keeps the mouth in its chewing state and replaces reason tags with the waiter action.
 - Opening the page preserves the unknown result underneath.
-- The bottom acknowledgement follows the selected waiter language; navigation back to the result remains in the header.
+- The bottom action is always the English label `Done`; it closes the waiter flow and returns directly to the camera. Navigation back to the unknown result remains in the header.
+- The message area scrolls independently between the fixed header and fixed acknowledgement button, including longer Japanese copy and short phone heights.
 - The card identifies the dish, asks about direct peanut use and preparation contact, and asks staff to say when they cannot confirm.
 
 ## Verification

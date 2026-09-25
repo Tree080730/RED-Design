@@ -45,7 +45,7 @@ function ToothSticker({x,y,size}:{x:number;y:number;size:number}){
 }
 export function CustomTeeth({x,y,width,height,showSticker=true}:{x:number;y:number;width:number;height:number;showSticker?:boolean}){
  const {config}=useMouthConfig();const tooth=width*.115;
- return <g transform={`translate(${x} ${y})`}>
+ return <g transform={`translate(${x} ${y})`} data-mouth-layer="teeth">
   {config.teeth==='buck'&&<g fill="#FFFFFF"><rect x={width/2-tooth-2} width={tooth} height={height*1.4} rx={height*.46}/><rect x={width/2+2} width={tooth} height={height*1.4} rx={height*.46}/></g>}
   {config.teeth==='gold'&&<rect x={width*.74} width={tooth} height={tooth*1.057} rx={tooth*.19} fill="#FFDB13"/>}
   {config.teeth==='gap'&&<rect x={width*.49} width={width*.035} y={-height*.02} height={Math.max(height*1.3,49)} fill={config.insideColor}/>}
@@ -56,7 +56,7 @@ export function CustomTeeth({x,y,width,height,showSticker=true}:{x:number;y:numb
 export function CustomTongue({x,y,width,height}:{x:number;y:number;width:number;height:number}){
  const {config}=useMouthConfig();
  const d=config.tongue==='flat'?'M10 40V12Q10 5 20 5H180Q190 5 190 12V40Z':config.tongue==='round'?'M0 40C0 -13 200 -13 200 40Z':config.tongue==='pointed'?'M0 40Q35 30 86 2Q100 -5 114 2Q165 30 200 40Z':'M0 40C12 0 62 -10 100 16C138 -10 188 0 200 40Z';
- return <svg x={x} y={y} width={width} height={height} viewBox="0 0 200 40" preserveAspectRatio="none" overflow="visible"><path d={d} fill={config.tongueColor}/></svg>;
+ return <svg x={x} y={y} width={width} height={height} viewBox="0 0 200 40" preserveAspectRatio="none" overflow="visible" data-mouth-layer="tongue"><path d={d} fill={config.tongueColor}/></svg>;
 }
 export function MouthPortrait({viewBox='0 0 400 280'}:{viewBox?:string}){
  const {config}=useMouthConfig();
@@ -70,7 +70,7 @@ export function MouthPortrait({viewBox='0 0 400 280'}:{viewBox?:string}){
   <rect x="26" y="38" width="348" height="214" rx="105" fill="#FDDECB"/>
   <CustomNose x={183} y={24} width={34} height={26}/>
   <g transform={`translate(200 145) scale(${config.mouthSize/100}) translate(-200 -145)`}>
-   <g clipPath={`url(#${clip})`}><path fill={config.insideColor} d="M40 30H360V240H40Z"/><path fill="#FFFFFF" d="M40 40H360V84H40ZM40 206H360V240H40Z"/><CustomTeeth x={40} y={config.teeth==='gap'?40:55} width={320} height={38}/><CustomTongue x={178} y={176} width={192} height={34}/></g>
+   <g clipPath={`url(#${clip})`}><path fill={config.insideColor} d="M40 30H360V240H40Z"/><CustomTongue x={178} y={176} width={192} height={34}/><path data-mouth-layer="teeth" fill="#FFFFFF" d="M40 40H360V84H40ZM40 206H360V240H40Z"/><CustomTeeth x={40} y={config.teeth==='gap'?40:55} width={320} height={38}/></g>
   </g>
  </svg>;
 }
@@ -149,8 +149,8 @@ function TeethOptionArt({sticker}:{sticker:boolean}){
    <CustomNose x={172} y={20} width={56} height={34}/>
    <path fill="#FFFFFF" d="M-50 149C-50 103 16 66 76 66H324C384 66 450 103 450 149V233C450 279 385 314 324 314H76C15 314 -50 279 -50 233Z"/>
    <path fill={config.insideColor} d="M0 104H400V278H0Z"/>
-   <CustomTeeth x={0} y={66} width={400} height={38}/>
    <CustomTongue x={172} y={236} width={240} height={42}/>
+   <CustomTeeth x={0} y={66} width={400} height={38}/>
   </>}
  </svg>;
 }
